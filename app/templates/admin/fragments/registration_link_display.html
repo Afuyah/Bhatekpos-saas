@@ -1,0 +1,18 @@
+<div class="space-y-2 bg-gray-50 p-4 rounded border border-gray-200">
+    <div>
+        <label class="text-sm font-medium">Registration Link</label>
+        <input type="text" class="mt-1 w-full border px-3 py-2 rounded text-sm" readonly value="{{ registration_url }}">
+    </div>
+
+    <div>
+        <label class="text-sm font-medium">Short Link</label>
+        <input type="text" class="mt-1 w-full border px-3 py-2 rounded text-sm" readonly value="{{ short_url }}">
+    </div>
+
+    <div>
+        <label class="text-sm font-medium">QR Code</label>
+        <div class="mt-2">
+            <img src="{{ qr_code_url }}" alt="QR Code for registration URL" class="h-32 w-32">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+{
+  "counties": [
+    {
+      "name": "Mombasa",
+      "code": "001",
+      "subcounties": [
+        {
+          "name": "Changamwe",
+          "code": "CHG",
+          "wards": ["Port Reitz", "Kipevu", "Airport", "Changamwe", "Chaani"]
+        },
+        {
+          "name": "Jomvu",
+          "code": "JMV",
+          "wards": ["Jomvu Kuu", "Miritini", "Mikindani"]
+        },
+        {
+          "name": "Kisauni",
+          "code": "KIS",
+          "wards": ["Mjambere", "Junda", "Bamburi", "Mwakirunge", "Mtopanga", "Mikindani"]
+        },
+        {
+          "name": "Likoni",
+          "code": "LKN",
+          "wards": ["Likoni", "Timbwani", "Shika Adabu", "Bofu", "Mtongwe", "Tsimba Golini"]
+        },
+        {
+          "name": "Mvita",
+          "code": "MVT",
+          "wards": ["Mji wa Kale", "Tudor", "Tononoka", "Shimanzi", "Majengo"]
+        },
+        {
+          "name": "Nyali",
+          "code": "NYL",
+          "wards": ["Frere Town", "Ziwa la Ngombe", "Mkomani", "Kongowea", "Kadzandani"]
+        }
+      ]
+    },
+    {
+      "name": "Kilifi",
+      "code": "002",
+      "subcounties": [
+        {
+          "name": "Mtwapa",
+          "code": "MTW",
+          "wards": ["Mtwapa", "Shimo la Tewa", "Mikanjuni"]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "country": "Kenya",
+    "source": "Government of Kenya - County Administrative Data",
+    "last_updated": "2023-11-15",
+    "county_data_complete": ["Mombasa"],
+    "statistics": {
+      "total_counties": 2,
+      "total_subcounties": 7,
+      "total_wards": 33,
+      "populated_data": {
+        "Mombasa": {
+          "subcounties": 6,
+          "wards": 30
+        },
+        "Kilifi": {
+          "subcounties": 1,
+          "wards": 3
+        }
+      }
+    }
+  }
+}

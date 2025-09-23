@@ -1,0 +1,284 @@
+{% extends 'base_layout.html' %}
+{% block title %}Register - {{ shop.name if shop else 'Bhapos' }}{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left Section: Visual Content - Hidden on mobile -->
+        <div class="hidden lg:flex flex-col space-y-8">
+            <!-- Animated Hero Section -->
+            <div class="relative rounded-2xl overflow-hidden shadow-2xl group h-96">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
+                     alt="Modern shop interior" 
+                     class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105">
+                <div class="absolute bottom-0 left-0 right-0 z-20 p-6 text-white space-y-2">
+                    <h3 class="text-3xl font-bold animate-fade-in-up"> {{ shop.name if shop else 'Bhapos' }}</h3>
+                    <p class="text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Join thousands of happy customers</p>
+                    <div class="flex space-x-2 mt-4">
+                        <span class="h-2 w-2 rounded-full bg-white animate-pulse"></span>
+                        <span class="h-2 w-2 rounded-full bg-white/50 animate-pulse delay-75"></span>
+                        <span class="h-2 w-2 rounded-full bg-white/30 animate-pulse delay-150"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Features Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                    <div class="bg-indigo-100 dark:bg-indigo-900/30 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Exclusive Offers</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">New members get special discounts</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                    <div class="bg-green-100 dark:bg-green-900/30 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Secure Shopping</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Your data is always protected</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                    <div class="bg-purple-100 dark:bg-purple-900/30 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Fast Checkout</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Save your details for quicker purchases</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                    <div class="bg-amber-100 dark:bg-amber-900/30 w-12 h-12 rounded-lg flex items-center justify-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Rewards Program</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Earn points with every purchase</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section: Registration Form - Full width on mobile -->
+        <div class="flex items-center justify-center">
+            <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-1 sm:p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
+                {% if shop and not registration_disabled %}
+                    <!-- Floating Card Header -->
+                    <div class="text-center relative">
+                       
+                        <h2 class="mt-8 text-3xl font-bold text-gray-900 dark:text-white bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Join {{ shop.name }}</h2>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            Create your account to start shopping
+                        </p>
+                    </div>
+
+                  
+
+                    <!-- Registration Form -->
+                    <form class="space-y-5" action="{{ url_for('auth.register_user', shop_slug=shop.slug) }}" method="POST" 
+                          hx-post="{{ url_for('auth.register_user', shop_slug=shop.slug) }}" hx-target="this">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Form Fields -->
+                        <div class="space-y-4">
+                            <!-- Username -->
+                            <div class="relative">
+                                <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Username
+                                </label>
+                                <div class="relative">
+                                    <input id="username" name="username" type="text" required
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition pl-11"
+                                        placeholder="yourusername"
+                                        value="{{ form.username.data or '' }}">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="relative">
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Email
+                                </label>
+                                <div class="relative">
+                                    <input id="email" name="email" type="email" required
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition pl-11"
+                                        placeholder="you@example.com"
+                                        value="{{ form.email.data or '' }}">
+                                    
+                                </div>
+                            </div>
+
+                            <!-- Name Fields - Stack on mobile -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- First Name -->
+                                <div>
+                                    <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        First Name
+                                    </label>
+                                    <input id="first_name" name="first_name" type="text"
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                                        placeholder="John"
+                                        value="{{ form.first_name.data or '' }}">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div>
+                                    <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Last Name
+                                    </label>
+                                    <input id="last_name" name="last_name" type="text"
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                                        placeholder="Doe"
+                                        value="{{ form.last_name.data or '' }}">
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="relative">
+                                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Phone Number
+                                </label>
+                                <div class="relative">
+                                    <input id="phone" name="phone" type="tel"
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition pl-11"
+                                        placeholder="+254 (712) 123-4567"
+                                        value="{{ form.phone.data or '' }}">
+                                    
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="relative">
+                                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Password
+                                </label>
+                                <div class="relative">
+                                    <input id="password" name="password" type="password" required
+                                        class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition pl-11"
+                                        placeholder="••••••••">
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.errors %}
+                            <div class="rounded-lg bg-red-100 dark:bg-red-900/30 px-4 py-3 text-red-700 dark:text-red-200 animate-shake">
+                                <div class="flex items-start space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <div>
+                                        {% for field, errors in form.errors.items() %}
+                                            {% for error in errors %}
+                                                <p>{{ field | capitalize }}: {{ error }}</p>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Terms and Privacy Checkbox -->
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="terms" name="terms" type="checkbox" required
+                                    class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">
+                                    I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Terms</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div>
+                            <button type="submit" 
+                                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md">
+                                Create Account
+                                <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="mt-6 text-center text-sm">
+                        <p class="text-gray-600 dark:text-gray-400">
+                            Already have an account? 
+                            <a href="{{ url_for('home.index', next=url_for('sales.sales_screen', shop_id=shop.id)) }}" 
+                               class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                {% else %}
+                    <!-- Error Messages -->
+                    <div class="text-center py-8">
+                        {% if not shop %}
+                            <div class="rounded-lg bg-red-100 dark:bg-red-900/30 p-6 text-red-700 dark:text-red-200 max-w-md mx-auto">
+                                <div class="flex flex-col items-center space-y-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <h3 class="text-lg font-medium">Shop Not Found</h3>
+                                    <p class="text-sm">The shop you're looking for doesn't exist or may have been moved.</p>
+                                    <a href="{{ url_for('home.index') }}" 
+                                       class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Back to Home
+                                    </a>
+                                </div>
+                            </div>
+                        {% elif registration_disabled %}
+                            <div class="rounded-lg bg-yellow-100 dark:bg-yellow-900/30 p-6 text-yellow-700 dark:text-yellow-200 max-w-md mx-auto">
+                                <div class="flex flex-col items-center space-y-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <h3 class="text-lg font-medium">Registrations Closed</h3>
+                                    <p class="text-sm">This shop is currently not accepting new member registrations.</p>
+                                    <a href="{{ url_for('home.index') }}" 
+                                       class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Back to Home
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add some custom animations -->
+<style>
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.5s ease-out forwards;
+    }
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,471 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}{{ shop.name if shop else 'Nourisha' }} - Complete Your Setup{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-white dark:from-gray-900 dark:to-gray-800 flex flex-col transition-colors duration-300">
+  <!-- Top Announcement Bar (Consistent with Homepage) -->
+  <div class="bg-gradient-to-r from-green-600 to-emerald-700 dark:from-emerald-800 dark:to-green-900 text-white text-sm py-2 px-4 text-center shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+      </svg>
+      <span class="font-medium">Welcome to {{ shop.name if shop else 'Nourisha Groceries' }} • Complete your setup to start shopping</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-6xl">
+      <!-- Progress Header -->
+      <div class="text-center mb-10">
+        <div class="mx-auto mb-6 flex justify-center">
+          <div class="relative w-full max-w-md">
+            <!-- Progress Bar -->
+            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-green-600 to-emerald-600 dark:from-emerald-500 dark:to-green-500 transition-all duration-500" 
+                   style="width: {% if addresses %}100%{% else %}50%{% endif %}"></div>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div class="absolute -bottom-8 left-0 right-0 flex justify-between">
+              <div class="flex flex-col items-center">
+                <div class="h-6 w-6 rounded-full flex items-center justify-center {% if not addresses %}bg-green-600 dark:bg-emerald-500 text-white{% else %}bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300{% endif %}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span class="mt-1 text-xs font-medium {% if not addresses %}text-green-600 dark:text-emerald-400{% else %}text-gray-500 dark:text-gray-400{% endif %}">Account</span>
+              </div>
+              
+              <div class="flex flex-col items-center">
+                <div class="h-6 w-6 rounded-full flex items-center justify-center {% if addresses %}bg-green-600 dark:bg-emerald-500 text-white{% else %}bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300{% endif %}">
+                  {% if addresses %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  {% else %}
+                    <span class="text-xs font-medium">2</span>
+                  {% endif %}
+                </div>
+                <span class="mt-1 text-xs font-medium {% if addresses %}text-green-600 dark:text-emerald-400{% else %}text-gray-500 dark:text-gray-400{% endif %}">Address</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+          {% if not addresses %}
+            <span class="text-gradient bg-gradient-to-r from-green-600 to-emerald-600 dark:from-emerald-400 dark:to-green-400 bg-clip-text text-transparent">One Last Step!</span>
+          {% else %}
+            Manage Your <span class="text-gradient bg-gradient-to-r from-green-600 to-emerald-600 dark:from-emerald-400 dark:to-green-400 bg-clip-text text-transparent">Delivery Addresses</span>
+          {% endif %}
+        </h1>
+        
+        <p class="mt-3 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          {% if not addresses %}
+            Add your delivery address to complete your account setup and start shopping
+          {% else %}
+            Add or update your delivery locations for faster checkout
+          {% endif %}
+        </p>
+        
+        {% if not addresses %}
+        <div class="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-green-200 dark:border-emerald-800 rounded-xl p-4 max-w-2xl mx-auto">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+              <svg class="h-5 w-5 text-green-500 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-green-800 dark:text-emerald-200">Why we need your address</h3>
+              <div class="mt-2 text-sm text-green-700 dark:text-emerald-300">
+                <p>We use your address to calculate accurate delivery fees, estimate arrival times, and ensure your groceries arrive fresh.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-8 space-y-4 max-w-4xl mx-auto">
+            {% for category, message in messages %}
+              <div class="rounded-md bg-{{ 'green' if category == 'success' else 'red' }}-50 dark:bg-{{ 'green' if category == 'success' else 'red' }}-900/30 p-4 border border-{{ 'green' if category == 'success' else 'red' }}-200 dark:border-{{ 'green' if category == 'success' else 'red' }}-800">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-{{ 'green' if category == 'success' else 'red' }}-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-{{ 'green' if category == 'success' else 'red' }}-800 dark:text-{{ 'green' if category == 'success' else 'red' }}-200">{{ message }}</p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+    
+        <!-- Add Address Form -->
+        <div class="bg-white dark:bg-gray-800/50 shadow-xl rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm">
+          <div class="px-6 py-5 bg-gradient-to-r from-green-600 to-emerald-600 dark:from-emerald-700 dark:to-green-800">
+            <h3 class="text-lg font-semibold text-white flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add New Address
+            </h3>
+          </div>
+          <div class="px-6 py-5">
+             <form method="POST" id="addressForm" action="{{ url_for('auth.set_address', next=(request.args.get('next') or url_for('home.index')).rstrip('?')) }}" class="space-y-5">
+              {{ form.hidden_tag() }}
+
+              <!-- Location Hierarchy -->
+              <div class="space-y-5">
+                <!-- County Selection -->
+                <div>
+                  <label for="county" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">County</label>
+                  <div class="relative">
+                    {{ form.county(class="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200" + (' border-red-300 dark:border-red-500' if form.county.errors else '')) }}
+                    <div id="county-loading" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none hidden">
+                      <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  {% for error in form.county.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                  {% endfor %}
+                </div>
+
+                <!-- Subcounty Selection -->
+                <div>
+                  <label for="subcounty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subcounty</label>
+                  <div class="relative">
+                    {{ form.subcounty(class="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200" + (' border-red-300 dark:border-red-500' if form.subcounty.errors else '') + (' bg-gray-100 dark:bg-gray-600' if not form.county.data else ''), disabled=not form.county.data) }}
+                    <div id="subcounty-loading" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none hidden">
+                      <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  {% for error in form.subcounty.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                  {% endfor %}
+                </div>
+
+                <!-- Ward Selection -->
+                <div>
+                  <label for="ward" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ward</label>
+                  <div class="relative">
+                    {{ form.ward(class="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200" + (' border-red-300 dark:border-red-500' if form.ward.errors else '') + (' bg-gray-100 dark:bg-gray-600' if not form.subcounty.data else ''), disabled=not form.subcounty.data) }}
+                    <div id="ward-loading" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none hidden">
+                      <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  {% for error in form.ward.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Address Details -->
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="estate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estate/Neighborhood</label>
+                  {{ form.estate(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200" + (' border-red-300 dark:border-red-500' if form.estate.errors else ''), placeholder="e.g. Kileleshwa, South B") }}
+                  {% for error in form.estate.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+                  {% endfor %}
+                </div>
+                
+                <div>
+                  <label for="landmark" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Landmark</label>
+                  {{ form.landmark(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200", placeholder="e.g. Near Shell Petrol Station") }}
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <div>
+                  <label for="building" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Building</label>
+                  {{ form.building(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200", placeholder="e.g. Green House") }}
+                </div>
+                
+                <div>
+                  <label for="apartment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Apartment</label>
+                  {{ form.apartment(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200", placeholder="e.g. A5") }}
+                </div>
+                
+                <div>
+                  <label for="house_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">House No.</label>
+                  {{ form.house_number(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200", placeholder="e.g. 42") }}
+                </div>
+              </div>
+
+              <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Delivery Notes</label>
+                {{ form.notes(class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 py-3 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-emerald-500 dark:focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-gray-200", rows=3, placeholder="e.g. Call when you arrive, black gate with golden handles") }}
+              </div>
+
+              <div class="flex items-center">
+                {{ form.is_primary(class="h-4 w-4 text-green-600 dark:text-emerald-400 focus:ring-green-500 dark:focus:ring-emerald-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700") }}
+                <label for="is_primary" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Set as primary address</label>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" class="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-medium text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md group">
+                  <span class="relative flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {% if not addresses %}Complete Setup & Start Shopping{% else %}Save Address{% endif %}
+                  </span>
+                </button>
+                
+                {% if addresses %}
+                <div class="mt-4 text-center">
+                  <a href="{{ (request.args.get('next') or url_for('home.index')).rstrip('?') }}" class="text-sm font-medium text-green-600 dark:text-emerald-400 hover:text-green-700 dark:hover:text-emerald-300 transition-colors inline-flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Continue shopping without changes
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+        </div>
+
+    
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer (Consistent with Homepage) -->
+  <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700/50 py-6 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+          </svg>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">© 2023 Nourisha Groceries. All rights reserved.</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Premium quality groceries delivered to your doorstep</p>
+          </div>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center space-x-6">
+          <a href="#" class="text-sm text-gray-500 hover:text-green-600 dark:hover:text-emerald-400 dark:text-gray-400 transition-colors">Privacy</a>
+          <a href="#" class="text-sm text-gray-500 hover:text-green-600 dark:hover:text-emerald-400 dark:text-gray-400 transition-colors">Terms</a>
+          <a href="#" class="text-sm text-gray-500 hover:text-green-600 dark:hover:text-emerald-400 dark:text-gray-400 transition-colors">Contact</a>
+          <span class="text-xs text-gray-400 dark:text-gray-500">Powered by <span class="text-green-600 dark:text-emerald-400 font-medium">BhaTek Solutions</span></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- Custom Styles -->
+<style>
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .animate-bounce {
+    animation: bounce 1s infinite;
+  }
+  
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+</style>
+
+<!-- Form Submission Handler -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM elements
+  const elements = {
+    county: document.getElementById('county'),
+    subcounty: document.getElementById('subcounty'),
+    ward: document.getElementById('ward'),
+    countyLoading: document.getElementById('county-loading'),
+    subcountyLoading: document.getElementById('subcounty-loading'),
+    wardLoading: document.getElementById('ward-loading'),
+    form: document.getElementById('addressForm')
+  };
+
+  // Error display element
+  const errorDisplay = document.createElement('div');
+  errorDisplay.className = 'text-red-600 dark:text-red-400 text-sm mt-1 hidden';
+  elements.county.parentNode.appendChild(errorDisplay);
+
+  // Reset select fields and show loading state
+  const resetSelect = (...selects) => {
+    selects.forEach(select => {
+      select.innerHTML = '<option value="">Loading...</option>';
+      select.disabled = true;
+      select.classList.add('bg-gray-100', 'dark:bg-gray-600');
+    });
+  };
+
+  // Show error message
+  const showError = (message) => {
+    errorDisplay.textContent = message;
+    errorDisplay.classList.remove('hidden');
+  };
+
+  // Hide error message
+  const hideError = () => errorDisplay.classList.add('hidden');
+
+  // Fetch data with error handling
+  const fetchData = async (url, loadingElement) => {
+    try {
+      loadingElement.classList.remove('hidden');
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      if (response.redirected) {
+        window.location.href = response.url;
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${await response.text()}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        throw new TypeError('Expected JSON response');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      showError('Failed to load data. Please try again.');
+      return null;
+    } finally {
+      loadingElement.classList.add('hidden');
+    }
+  };
+
+  // Update select options
+  const updateSelect = (select, items, placeholder) => {
+    if (!items) {
+      select.innerHTML = '<option value="">Error loading data</option>';
+      return;
+    }
+    select.innerHTML = `<option value="">${placeholder}</option>`;
+    items.forEach(item => select.add(new Option(item.name, item.id)));
+    select.disabled = false;
+    select.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+  };
+
+  // Load subcounties for a county
+  const loadSubcounties = async (countyId) => {
+    const data = await fetchData(`/auth/api/subcounties/${countyId}`, elements.subcountyLoading);
+    updateSelect(elements.subcounty, data, 'Select Subcounty');
+  };
+
+  // Load wards for a subcounty
+  const loadWards = async (subcountyId) => {
+    const data = await fetchData(`/auth/api/wards/${subcountyId}`, elements.wardLoading);
+    updateSelect(elements.ward, data, 'Select Ward');
+  };
+
+  // Initialize if county is selected
+  if (elements.county.value) {
+    loadSubcounties(elements.county.value);
+  }
+
+  // County change handler
+  elements.county.addEventListener('change', () => {
+    const countyId = elements.county.value;
+    resetSelect(elements.subcounty, elements.ward);
+    hideError();
+    if (countyId) loadSubcounties(countyId);
+  });
+
+  // Subcounty change handler
+  elements.subcounty.addEventListener('change', () => {
+    const subcountyId = elements.subcounty.value;
+    resetSelect(elements.ward);
+    hideError();
+    if (subcountyId) loadWards(subcountyId);
+  });
+
+  // Form submission handler
+  if (elements.form) {
+    elements.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = elements.form.querySelector('button[type="submit"]');
+      const originalHtml = submitButton.innerHTML;
+
+      try {
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+          <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Processing...
+        `;
+
+        const formData = new FormData(elements.form);
+        const response = await fetch(elements.form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        const data = await response.json();
+        if (data.success && data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          throw new Error(data.error || 'Failed to save address');
+        }
+      } catch (error) {
+        console.error('Submission error:', error);
+        showError(error.message);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalHtml;
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+ <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Bhapos - Professional POS System">
+<meta name="theme-color" content="#4ade80"> 
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{% block title %}Bhapos{% endblock %}</title>
+  <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.mini.css') }}">
+
+    
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css')}}">
+  
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+
+</head>
+
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
+    <!-- App Container -->
+    <div class="flex h-full">
+       
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+           
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-50">
+                {% block content %}
+                <!-- Content will be injected here -->
+                {% endblock %}
+            </main>
+
+            </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50 w-80"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                        registration.onupdatefound = () => {
+                            const installingWorker = registration.installing;
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showToast({
+                                        message: 'New version available. Click to refresh!',
+                                        type: 'info',
+                                        action: () => window.location.reload()
+                                    });
+                                }
+                            };
+                        };
+                    })
+                    .catch(error => console.error('ServiceWorker registration failed:', error));
+            });
+        }
+
+        // Toast Notification System
+        function showToast({message, type = 'info', action = null, duration = 5000}) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            // Type-based styling
+            const typeStyles = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            toast.className = `animate-fade-in p-4 rounded-lg shadow-lg text-white flex items-start ${typeStyles[type] || typeStyles.info}`;
+            toast.innerHTML = `
+                <div class="flex-1">
+                    <div class="flex items-center">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                          type === 'error' ? 'fa-exclamation-circle' : 
+                                          type === 'warning' ? 'fa-exclamation-triangle' : 
+                                          'fa-info-circle'} mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                </div>
+                <button class="ml-4 text-white opacity-70 hover:opacity-100">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add click handler if action provided
+            if (action) {
+                toast.style.cursor = 'pointer';
+                toast.addEventListener('click', action);
+            }
+            
+            // Close button
+            toast.querySelector('button').addEventListener('click', (e) => {
+                e.stopPropagation();
+                toast.remove();
+            });
+            
+            // Auto-dismiss
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+            
+            container.appendChild(toast);
+            
+            // Return dismiss function
+            return {
+                dismiss: () => toast.remove()
+            };
+        }
+
+        // Make toast function globally available
+        window.showToast = showToast;
+
+        // Convert Flask flash messages to toasts
+        document.addEventListener('DOMContentLoaded', () => {
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        showToast({
+                            message: "{{ message }}",
+                            type: "{{ category }}"
+                        });
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
+
+     
+    </script>
+
+</body>
+</html>

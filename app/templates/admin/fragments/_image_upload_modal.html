@@ -1,0 +1,50 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70" id="image-upload-modal">
+  <div class="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-lg relative animate-fade-in">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Upload Product Image</h2>
+
+    <form
+      hx-post="{{ url_for('inventory.upload_product_image', shop_id=shop_id, product_id=product_id) }}"
+      hx-encoding="multipart/form-data"
+      hx-target="#upload-status"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      class="space-y-4"
+    >
+      <label
+        for="image"
+        class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+      >
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <svg class="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path d="M7 16V4a4 4 0 014-4h2a4 4 0 014 4v12M5 20h14a2 2 0 002-2v-5H3v5a2 2 0 002 2z"/>
+          </svg>
+          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+        </div>
+        <input id="image" name="image" type="file" accept="image/*" class="hidden" required>
+      </label>
+
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="is_primary" name="is_primary" value="true"
+               class="text-blue-600 border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600">
+        <label for="is_primary" class="text-sm text-gray-700 dark:text-gray-300">Mark as primary image</label>
+      </div>
+
+      <div id="upload-status" class="text-sm text-center"></div>
+
+      <div class="flex justify-end gap-3">
+        <button type="button"
+                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                onclick="document.getElementById('image-upload-modal').remove()">Cancel</button>
+
+        <button type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Optional: Animate modal fade-in
+  document.querySelector('#image-upload-modal')?.classList.add('animate-fade-in');
+</script>

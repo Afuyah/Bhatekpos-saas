@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Your Addresses</h2>
+    
+    {% if not addresses %}
+    <div class="alert alert-info">
+        You haven't added any addresses yet. Please add one to continue.
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Add New Address</h4>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.subcounty) }}
+                {{ render_field(form.ward) }}
+                {{ render_field(form.estate) }}
+                {{ render_field(form.landmark) }}
+                {{ render_field(form.building) }}
+                {{ render_field(form.apartment) }}
+                {{ render_field(form.house_number) }}
+                {{ render_field(form.notes) }}
+                {{ render_field(form.is_primary) }}
+                <button type="submit" class="btn btn-primary">Save Address</button>
+            </form>
+        </div>
+        
+        <div class="col-md-6">
+            <h4>Your Addresses</h4>
+            {% for address in addresses %}
+            <div class="card mb-3 {% if address.is_primary %}border-primary{% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {% if address.is_primary %}
+                        <span class="badge bg-primary">Primary</span>
+                        {% endif %}
+                        {{ address.estate or 'No estate specified' }}
+                    </h5>
+                    <p class="card-text">
+                        {{ address.building }} {{ address.apartment }}<br>
+                        {{ address.house_number }}<br>
+                        {{ address.ward.name }}, {{ address.subcounty.name }}<br>
+                        <small class="text-muted">{{ address.notes }}</small>
+                    </p>
+                    <div class="btn-group">
+                        <a href="{{ url_for('auth.edit_address', address_id=address.id) }}" 
+                           class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="POST" action="{{ url_for('auth.delete_address', address_id=address.id) }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                        {% if not address.is_primary %}
+                        <form method="POST" action="{{ url_for('auth.set_primary_address', address_id=address.id) }}">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Set Primary</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('subcounty').addEventListener('change', function() {
+    const subcountyId = this.value;
+    const wardSelect = document.getElementById('ward');
+    
+    if (subcountyId) {
+        fetch(`/get-wards/${subcountyId}`)
+            .then(response => response.json())
+            .then(data => {
+                wardSelect.innerHTML = '';
+                data.forEach(ward => {
+                    const option = document.createElement('option');
+                    option.value = ward.id;
+                    option.textContent = ward.name;
+                    wardSelect.appendChild(option);
+                });
+            });
+    }
+});
+</script>
+{% endblock %}

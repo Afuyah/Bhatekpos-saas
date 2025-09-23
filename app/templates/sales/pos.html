@@ -1,0 +1,2055 @@
+{% extends 'base_layout.html' %}
+
+{% block title %} {{ current_shop.name }} | Bhapos {% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-50 dark:bg-gray-900 font-sans antialiased transition-colors duration-300 flex-col">
+    <!-- Sidebar - Wider and Responsive -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 lg:w-80 bg-gradient-to-b from-gray-800 to-gray-900 text-white flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out z-40 shadow-2xl">
+    <!-- Shop Header  -->
+    <div class="p-5 border-b border-gray-700 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                <i class="fas fa-store text-white text-lg"></i> <!-- Changed icon to "store" -->
+            </div>
+            <h3 class="text-xl font-bold text-amber-300 truncate">{{ current_shop.name }}</h3>
+        </div>
+        <button id="sidebar-close" class="text-gray-300 hover:text-white" aria-label="Close sidebar">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+    </div>
+
+    <!-- User Profile  -->
+    <div class="p-5 border-b border-gray-700 flex items-center space-x-3">
+        <div class="relative">
+            <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-amber-400 font-semibold text-xl shadow-inner">
+                {{ current_user.username[0]|upper }}
+            </div>
+            <div class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-green-400 border-2 border-gray-900"></div>
+        </div>
+        <div>
+            <h3 class="text-base font-semibold text-white">{{ current_user.username }}</h3>
+            <p class="text-xs text-gray-400">Customer</p> <!-- Changed from "Premium User" -->
+        </div>
+    </div>
+
+    <!-- Navigation Links  -->
+    <nav class="flex-1 overflow-y-auto p-5 space-y-4">
+        <!-- Shopping Section -->
+        <div>
+            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Shopping</h2> <!-- Changed from "Sales" -->
+            <ul class="space-y-2 mt-3">
+                <li>
+                    <a href="#" class="w-full flex items-center space-x-3 p-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 transition-all group" title="Browse Products" aria-label="Shop Now">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/30 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/40 transition-colors">
+                            <i class="fas fa-store text-base"></i> <!-- Changed icon -->
+                        </div>
+                        <span class="text-sm text-white">Shop Now</span> <!-- Changed from "New Sale" -->
+                        <span class="ml-auto px-2 py-1 bg-amber-400 text-gray-900 text-xs rounded-full">Active</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="loadRecentTransactionsModal(); document.getElementById('recent-transactions-modal').classList.remove('hidden')"  class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Order History" aria-label="My Orders">
+                        <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
+                            <i class="fas fa-history text-base"></i> <!-- Changed icon -->
+                        </div>
+                        <span class="text-sm text-white">My Orders</span> <!-- Changed from "History" -->
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Products Section -->
+        <div>
+            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Products</h2> <!-- Changed from "Management" -->
+            <ul class="space-y-2 mt-3">
+                <li>
+                    <a href="#" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Browse Products" aria-label="Products">
+                        <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
+                            <i class="fas fa-box-open text-base"></i> <!-- Changed icon -->
+                        </div>
+                        <span class="text-sm text-white">Browse Products</span> <!-- Changed from "Inventory" -->
+                    </a>
+                </li>
+                {% if current_user.is_tenant() or current_user.is_admin() %}
+                <li>
+                    <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Manage Store" aria-label="Settings">
+                        <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
+                            <i class="fas fa-sliders text-base"></i>
+                        </div>
+                        <span class="text-sm text-white">Settings</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Logout  -->
+    <div class="p-5 border-t border-gray-700">
+        <a href="{{ url_for('auth.logout') }}" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" aria-label="Logout">
+            <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
+                <i class="fas fa-arrow-right-from-bracket text-base"></i>
+            </div>
+            <span class="text-sm text-white">Logout</span>
+        </a>
+    </div>
+</aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col transition-all duration-300">
+        <!-- Fixed Header -->
+        <header class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm z-30">
+    <!-- Left Section: Shop Logo & Name -->
+    <div class="flex items-center space-x-4">
+        <button id="sidebar-toggle" class="text-gray-600 dark:text-gray-300 hover:text-amber-500 transition-colors p-2 rounded-full" aria-label="Toggle menu">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                <i class="fas fa-store text-white text-lg"></i>
+            </div>
+            <div class="hidden sm:block">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 truncate max-w-[200px]" id="shop-name">{{ current_shop.name }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Section: User Controls -->
+    <div class="flex items-center space-x-4">
+        <!-- Notifications (Simplified) -->
+        <div class="relative">
+            <button class="notification-btn p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Notifications">
+                <i class="fas fa-bell text-gray-600 dark:text-gray-300 text-lg"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold" id="notification-badge">0</span>
+            </button>
+            <div class="notification-dropdown hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 z-40">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-100">Order Updates</h3> <!-- Changed from "Notifications" -->
+                    <button class="text-sm text-amber-500 hover:text-amber-600" aria-label="Mark all as read">Clear All</button>
+                </div>
+                <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                    <p>No new updates</p> <!-- Dynamic content will go here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-2">
+            
+            <button class="action-btn w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Refresh Products" aria-label="Refresh">
+                <i class="fas fa-sync-alt text-base"></i>
+            </button>
+            <button id="fullscreen-toggle" class="action-btn w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+                <i class="fas fa-expand text-base"></i>
+            </button>
+        </div>
+
+        <!-- User Profile Dropdown -->
+        <div class="relative hidden md:block" id="user-profile-dropdown">
+            <button class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold text-lg cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Account menu z-1000">
+                {{ current_user.username[0]|upper }}
+            </button>
+            <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-40 py-1">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-user mr-2"></i> My Account
+                </a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-question-circle mr-2"></i> Help <!-- Moved help here -->
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        document.getElementById('user-profile-dropdown').addEventListener('click', (e) => {
+    const dropdown = e.currentTarget.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('hidden');
+});
+
+// Close dropdown when clicking elsewhere
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#user-profile-dropdown')) {
+        document.querySelector('.dropdown-menu').classList.add('hidden');
+    }
+});
+    </script>
+</header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900 pt-[80px] pb-[60px]">
+            <div class="h-full p-4 md:p-6">
+                <!-- POS Interface -->
+                <div id="pos-interface" class="h-full flex flex-col md:flex-row overflow-hidden gap-4">
+                    <!-- Product Catalog - Improved Layout -->
+                    <div id="catalog-container" class="flex-1 flex flex-col border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden rounded-2xl shadow-lg h-[calc(100vh-8rem)]">
+    <!-- Search & Filter Header -->
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 sticky top-0 z-10">
+        <div class="flex flex-col space-y-3">
+            <!--  Search -->
+            <div class="relative">
+                <input type="text" id="product-search" placeholder="Search products..." 
+                       class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 dark:focus:ring-amber-500 transition-all bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm"
+                       aria-label="Search products">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 dark:text-gray-500"></i>
+                <!-- Clear Search Button -->
+                <button id="clear-search" class="absolute right-3 top-3.5 text-gray-400 hover:text-amber-500 hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Category Chips -->
+            <div class="flex overflow-x-auto space-x-2 pb-1 scrollbar-hide" id="category-tabs">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="flex-1 overflow-y-auto p-4 relative">
+        <!-- Loading State -->
+        <div id="loading-overlay-products" class="hidden absolute inset-0 bg-white/90 dark:bg-gray-800/90 flex flex-col items-center justify-center z-10">
+            <div class="loader relative w-16 h-16 mb-4">
+                <div class="absolute inset-0 border-4 border-transparent border-t-amber-500 dark:border-t-amber-400 rounded-full animate-spin"></div>
+                <div class="absolute inset-1 border-4 border-transparent border-b-amber-500 dark:border-b-amber-400 rounded-full animate-spin-reverse"></div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 font-semibold">Loading Products...</p>
+        </div>
+        
+        <!-- Product Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-4" id="product-grid"></div>
+        
+        <!-- Empty State -->
+        <div id="products-empty-state" class="hidden text-center py-12">
+            <div class="bg-gray-100 dark:bg-gray-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <i class="fas fa-search text-3xl text-gray-400 dark:text-gray-500"></i>
+            </div>
+            <h4 class="text-gray-600 dark:text-gray-300 font-semibold mb-2">No products found</h4>
+            <p class="text-gray-400 dark:text-gray-500 text-sm max-w-md mx-auto">Try a different search or category</p>
+        </div>
+    </div>
+</div>
+
+                    <!-- Cart Container - Improved Responsiveness -->
+                   <div id="cart-container" class="md:w-96 lg:w-[32rem] flex flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg fixed md:relative bottom-0 left-0 right-0 md:top-0 md:right-0 md:bottom-0 transform translate-y-full md:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-3xl md:rounded-none z-50 overflow-hidden h-[90vh] md:h-[calc(100vh-8rem)] p-3">
+    <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 text-white flex justify-between items-center shadow-sm sticky top-0 z-10">
+        <div class="flex items-center space-x-3">
+            <button id="cart-collapse-toggle" class="text-white text-lg hover:text-amber-400 transition-colors md:hidden" aria-label="Toggle cart">
+                <i class="fas fa-chevron-up"></i>
+            </button>
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+                <i class="fas fa-receipt"></i> Your Order
+                
+            </h3>
+        </div>
+        <button id="clear-cart" class="text-amber-400 hover:text-amber-300 transition-colors text-sm flex items-center font-semibold" aria-label="Clear cart">
+            <i class="fas fa-trash-alt mr-2"></i> <span class="hidden sm:inline">Clear</span>
+        </button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-6 py-5 bg-gray-50 dark:bg-gray-900">
+        <div id="cart-items" class="space-y-4"></div>
+        <div id="empty-cart" class="h-full flex flex-col items-center justify-center py-12 text-center">
+            <div class="bg-gray-200 dark:bg-gray-700 w-20 h-20 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                <i class="fas fa-shopping-basket text-3xl text-gray-500 dark:text-gray-400"></i>
+            </div>
+            <h4 class="font-semibold text-gray-600 dark:text-gray-300 mb-2 text-lg">Your cart is empty</h4>
+            <p class="text-gray-400 dark:text-gray-500 text-sm">Begin by adding products</p>
+        </div>
+    </div>
+    <div class="border-t border-gray-200 dark:border-gray-700 px-3 py-3 bg-white dark:bg-gray-800 shrink-0">
+                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
+                                    <span>Subtotal:</span>
+                                    <span class="font-semibold" id="subtotal">Ksh 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
+                                    <span>Tax (0%):</span>
+                                    <span class="font-semibold" id="tax">Ksh 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
+                                    <span>Discount:</span>
+                                    <span class="text-green-500 dark:text-green-400 font-semibold" id="discount">- Ksh 0.00</span>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mb-2 text-base font-bold">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700 dark:text-gray-200">Total:</span>
+                                    <span class="text-gray-900 dark:text-gray-100" id="total">Ksh 0.00</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Methods - Improved Design -->
+                            <div class="mb-4">
+    <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Payment Method</label>
+    <div class="grid grid-cols-2 gap-3" id="payment-methods">
+        <!-- Pay on Delivery -->
+        <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="pay_on_delivery" aria-label="Pay on Delivery">
+            <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 dark:text-amber-400 mb-2 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
+                <i class="fas fa-truck text-lg"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Pay on Delivery</span>
+            <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-amber-500 transition-colors"></div>
+        </button>
+
+        <!-- Mobile Payment -->
+       <button
+      class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group opacity-50 cursor-not-allowed"
+      data-method="mobile"
+      data-disabled="true"
+      aria-label="Pay with M-Pesa"
+    >
+      <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+        <i class="fas fa-mobile-screen-button text-lg"></i>
+      </div>
+      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Mobile</span>
+      <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
+    </button>
+
+    </div>
+</div>
+
+                            
+                            <!-- Complete Sale Button - More Prominent -->
+                            <button id="complete-sale" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-full font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base group" aria-label="Complete Sale">
+                                <i class="fas fa-check-circle mr-3 transition-transform group-hover:scale-110"></i> 
+                                <span class="transition-transform group-hover:scale-105">Checkout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Footer -->
+            <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-gray-800 to-gray-900 text-white py-3 px-4 sm:px-6 shadow-lg z-30">
+                <div class="flex justify-between items-center text-xs">
+                    <p>© 2025 Bhapos. All rights reserved.</p>
+                    <p>Powered by <span class="text-amber-400 font-semibold">Bhatek solutions</span></p>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Floating Cart Toggle - More Visible -->
+        <div class="md:hidden fixed bottom-20 right-6 z-50">
+            <button id="floating-cart-toggle" class="w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg flex items-center justify-center hover:bg-amber-600 transition-all transform hover:scale-105 active:scale-95" aria-label="Toggle cart">
+                <i class="fas fa-shopping-cart text-xl"></i>
+                <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold hidden">0</span>
+            </button>
+        </div>
+
+        <!-- Confirm Sale Modal - Improved Design -->
+        <div id="confirm-sale-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md mx-4 p-6 space-y-6 border border-gray-200 dark:border-gray-700 transform transition-all duration-300 scale-95 opacity-0" id="confirm-sale-modal-inner">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Confirm Sale</h2>
+                    <button id="cancel-confirm-sale" class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition" aria-label="Close modal">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <div id="confirm-sale-summary" class="text-sm text-gray-700 dark:text-gray-300 space-y-3"></div>
+                <div class="flex justify-end gap-4 pt-4">
+                    <button id="cancel-confirm-sale-btn" class="px-6 py-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition font-semibold" aria-label="Cancel">
+                        Cancel
+                    </button>
+                    <button id="confirm-complete-sale" class="px-6 py-2 text-sm rounded-full bg-amber-500 text-white hover:bg-amber-600 transition font-semibold flex items-center" aria-label="Complete Sale">
+                        <i class="fas fa-check-circle mr-2"></i> Complete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+   <div id="recent-transactions-modal" 
+     class="fixed inset-0 z-50 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 sm:px-6 hidden">
+  
+  <div class="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] transition-all">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed view of all transactions</p>
+      </div>
+      <button onclick="document.getElementById('recent-transactions-modal').classList.add('hidden')" 
+              class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div id="recent-transactions-body" 
+         class="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white dark:bg-gray-800 thin-scrollbar">
+      <!-- Transactions will be injected here -->
+    </div>
+
+    <!-- Optional Footer (e.g., for actions) -->
+    <!--
+    <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <button class="btn">Close</button>
+    </div>
+    -->
+  </div>
+</div>
+
+
+
+
+
+        <!-- Global Loading Overlay -->
+<div id="global-loading-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div id="loading-modal-inner" class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-2xl shadow-xl text-center w-[90%] max-w-sm scale-95 opacity-0 transition-all duration-300">
+    
+    <!-- New Cube Loader -->
+    <div class="loader-cube mx-auto mb-6 flex gap-1 justify-center items-center">
+      <div class="cube cube1"></div>
+      <div class="cube cube2"></div>
+      <div class="cube cube3"></div>
+    </div>
+
+    <h3 id="loading-message" class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+      Just a moment...
+    </h3>
+    <p id="loading-submessage" class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+      We’re getting things ready for you
+    </p>
+
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-4 overflow-hidden">
+      <div class="bg-amber-500 dark:bg-amber-400 h-1.5 rounded-full animate-progress"></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<style>
+    
+ .loader-cube .cube {
+  width: 12px;
+  height: 12px;
+  background-color: #f59e0b; /* amber-500 */
+  animation: cubeBounce 1s infinite ease-in-out;
+  border-radius: 3px;
+}
+.loader-cube .cube1 {
+  animation-delay: 0s;
+}
+.loader-cube .cube2 {
+  animation-delay: 0.2s;
+}
+.loader-cube .cube3 {
+  animation-delay: 0.4s;
+}
+
+@keyframes cubeBounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-progress {
+  animation: progress 2s linear infinite;
+}
+
+</style>
+        <!-- Notification Container - Improved Design -->
+        <div id="notification-container" class="fixed top-6 right-6 space-y-3 z-50 w-80"></div>
+    </div>
+
+    <!-- Tailwind CSS Scrollbar Hide Utility and Animations -->
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Improved Animations */
+        @keyframes cartAdd {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes spin-reverse {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+        
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.7; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 50%; }
+            100% { width: 100%; }
+        }
+        
+        .animate-progress {
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .animate-cart-add {
+            animation: cartAdd 0.5s ease-out;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse-slow 1.5s ease-in-out infinite;
+        }
+        
+        /* Product Card Hover Effects */
+        .pos-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Quantity Counter Transition */
+        .quantity-counter {
+            transition: all 0.2s ease;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            #product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            #cart-container {
+                height: 70vh;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            #product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+    <!-- JavaScript for Sidebar, Cart, and Fullscreen Toggle -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const cartContainer = document.getElementById('cart-container');
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        const floatingCartToggle = document.getElementById('floating-cart-toggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+        });
+
+        floatingCartToggle.addEventListener('click', () => {
+            cartContainer.classList.toggle('translate-y-full');
+            const icon = floatingCartToggle.querySelector('i');
+            if (cartContainer.classList.contains('translate-y-full')) {
+                icon.classList.remove('fa-shopping-cart');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-shopping-cart');
+            }
+        });
+
+        fullscreenToggle.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = fullscreenToggle.querySelector('i');
+            if (document.fullscreenElement) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+            } else {
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Constants
+        const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
+        const currencyFormatter = new Intl.NumberFormat('en-KE', {
+            style: 'currency',
+            currency: 'KES',
+            minimumFractionDigits: 2
+        });
+        const TAX_RATE = 0.16;
+
+        // DOM Elements
+        const elements = {
+            posInterface: document.getElementById('pos-interface'),
+            productGrid: document.getElementById('product-grid'),
+            productsEmptyState: document.getElementById('products-empty-state'),
+            categoryTabs: document.getElementById('category-tabs'),
+            productSearch: document.getElementById('product-search'),
+            cartItems: document.getElementById('cart-items'),
+            subtotalEl: document.getElementById('subtotal'),
+            taxEl: document.getElementById('tax'),
+            totalEl: document.getElementById('total'),
+            completeSaleBtn: document.getElementById('complete-sale'),
+            clearCartBtn: document.getElementById('clear-cart'),
+            emptyCart: document.getElementById('empty-cart'),
+            paymentMethods: document.getElementById('payment-methods'),
+            globalLoadingOverlay: document.getElementById('global-loading-overlay'),
+            loadingMessage: document.getElementById('loading-message'),
+            loadingSubmessage: document.getElementById('loading-submessage'),
+            cartItemCount: document.getElementById('cart-item-count')
+        };
+
+        // State Management
+        const state = {
+            shopId: null,
+            shopInfo: null,
+            products: [],
+            categories: [],
+            cart: [],
+            paymentMethods: [],
+            taxRate: 0,
+            cartVisible: false,
+            isMobileView: window.innerWidth < 1024,
+            lastAddedProductId: null,
+            lastAddTime: 0,
+            selectedPaymentMethod: null,
+            activeProductId: null // Track which product has active quantity controls
+        };
+
+        // Utility Functions
+        function extractShopIdFromPath(expectedPrefix = '/shops') {
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const shopIndex = pathParts.indexOf(expectedPrefix.replace('/', ''));
+            if (shopIndex === -1 || !pathParts[shopIndex + 1]) {
+                console.error('Could not locate shop segment in URL');
+                throw new Error('Invalid shop path');
+            }
+            return parseInt(pathParts[shopIndex + 1]);
+        }
+
+        function formatCurrency(amount) {
+            return currencyFormatter.format(amount || 0);
+        }
+
+        function showLoading(message = 'Processing...', submessage = 'Please wait') {
+            elements.loadingMessage.textContent = message;
+            elements.loadingSubmessage.textContent = submessage;
+            elements.globalLoadingOverlay.classList.remove('hidden');
+            
+            // Trigger animation after display
+            setTimeout(() => {
+                document.getElementById('loading-modal-inner').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('loading-modal-inner').classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-modal-inner').classList.remove('scale-100', 'opacity-100');
+            document.getElementById('loading-modal-inner').classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                elements.globalLoadingOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modal.classList.add('flex');
+                document.getElementById(`${modalId}-inner`).classList.remove('scale-95', 'opacity-0');
+                document.getElementById(`${modalId}-inner`).classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(`${modalId}-inner`).classList.remove('scale-100', 'opacity-100');
+            document.getElementById(`${modalId}-inner`).classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                const modal = document.getElementById(modalId);
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `px-4 py-3 rounded-lg shadow-lg text-white animate-fade-in flex items-start ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' :
+                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+            }`;
+            notification.innerHTML = `
+                <i class="fas ${
+                    type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' :
+                    type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
+                } mr-2 mt-0.5"></i>
+                <span>${message}</span>
+            `;
+            document.getElementById('notification-container').appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function handleError(context, error) {
+            console.error(`${context}:`, error);
+            let message = context;
+            if (error.response) {
+                if (error.response.status === 401) {
+                    message = 'Session expired. Please login again.';
+                    setTimeout(() => window.location.href = '/auth/login', 2000);
+                } else if (error.response.status === 403) {
+                    message = 'You don\'t have permission for this action';
+                } else if (error.response.data?.message) {
+                    message = error.response.data.message;
+                }
+            }
+            showNotification(message, 'error');
+        }
+
+        // POS Initialization
+        async function initPOS() {
+            try {
+                showLoading('Loading System...');
+                state.shopId = extractShopIdFromPath();
+                if (!state.shopId) {
+                    throw new Error('Could not determine shop ID');
+                }
+                const response = await fetch(`/api/shops/${state.shopId}/pos-data`);
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+                const data = await response.json();
+                state.shopInfo = data.shop;
+                state.products = data.products || [];
+                state.categories = data.categories || [];
+                state.paymentMethods = data.payment_methods || [];
+               
+                renderProducts();
+                renderCategories();
+                setupPaymentMethods();
+                loadCartFromLocalStorage();
+                updateCartUI();
+            } catch (error) {
+                handleError('POS initialization failed', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Data Loading
+        async function loadShopData() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/shop-info?t=${Date.now()}`, {
+                    timeout: 3000,
+                    headers: { 'X-Critical-Request': 'true' }
+                });
+                state.shopInfo = res.data;
+                const shopNameEl = document.getElementById('shop-name');
+                if (shopNameEl) shopNameEl.textContent = state.shopInfo.name.substring(0, 24);
+            } catch (error) {
+                state.shopInfo = JSON.parse(localStorage.getItem('lastShopInfo')) || { name: 'Our Store' };
+                handleError('Shop load failed', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                showLoading('Loading Products...');
+                const cacheKey = 'products-v1';
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    state.products = JSON.parse(cached);
+                    renderProducts();
+                }
+                const response = await axios.get(`${API_BASE_URL}/products?limit=500`, {
+                    timeout: 5000,
+                    headers: { 'X-Request-Type': 'product-list' }
+                });
+                state.products = response.data;
+                localStorage.setItem(cacheKey, JSON.stringify(response.data));
+                renderProducts();
+            } catch (error) {
+                elements.productGrid.innerHTML = errorFallbackUI();
+                handleError('Products load failed', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/categories?minimal=true`);
+                state.categories = res.data;
+                renderCategories();
+            } catch (err) {
+                console.warn('Categories failed:', err);
+                state.categories = [];
+            }
+        }
+
+        function loadCartFromLocalStorage() {
+            try {
+                const stored = localStorage.getItem('pos_cart');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        state.cart = parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Error loading cart from localStorage:', e);
+                state.cart = [];
+            }
+            updateCartUI();
+        }
+
+        function saveCartToLocalStorage() {
+            try {
+                localStorage.setItem('pos_cart', JSON.stringify(state.cart));
+            } catch (e) {
+                console.warn('Failed to save cart:', e);
+            }
+        }
+
+        // UI Rendering
+        function renderProducts() {
+            const grid = elements.productGrid;
+            const empty = elements.productsEmptyState;
+            if (!state.products || state.products.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.innerHTML = `
+                    <div class="text-center p-6">
+                        <div class="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3 shadow-inner">
+                            <i class="fas fa-box-open text-xl text-gray-400 dark:text-gray-500" aria-hidden="true"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-600 dark:text-gray-300 mb-2 text-lg">No products found</h4>
+                        <p class="text-gray-400 dark:text-gray-500 text-sm max-w-md mx-auto">Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+            grid.classList.remove('hidden');
+            empty.classList.add('hidden');
+            const fragment = document.createDocumentFragment();
+            const cardTemplate = document.createElement('div');
+            cardTemplate.className = 'contents';
+            cardTemplate.innerHTML = state.products.map(product => {
+    const { id, name, price, discount = 0, image_url, category, combination_size, combination_price } = product;
+    const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+    const hasImage = Boolean(image_url);
+    const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    const isCombo = combination_size && combination_price;
+    const cartQuantity = getCurrentCartQuantity(id);
+
+    return `
+    <div class="pos-card group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg transition-all duration-300" data-id="${id}">
+        <!-- Product Image Container -->
+        <div class="relative bg-gray-100 dark:bg-gray-800 aspect-[4/3] w-full flex items-center justify-center overflow-hidden">
+            ${hasImage ? `
+                <img src="${image_url}" alt="${name}"
+                    class="absolute inset-0 w-full h-full object-contain md:object-cover p-1 transition-transform duration-300 ease-in-out group-hover:scale-105"
+                    loading="lazy"
+                    onerror="this.src='/static/products/placeholder.jpg'; this.classList.remove('p-4');"
+                />
+            ` : `
+                <div class="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                    <div class="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-300 font-bold text-2xl shadow-inner">
+                        ${initials}
+                    </div>
+                </div>
+            `}
+            ${discount > 0 ? `
+                <span class="absolute top-2 right-2 text-xs font-semibold bg-green-500 dark:bg-green-600 text-white px-2 py-0.5 rounded-full shadow">
+                    -${discount}%
+                </span>` : ''}
+        </div>
+
+        <!-- Product Info -->
+        <div class="flex flex-col flex-1 p-4 gap-2">
+            <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-tight">${name}</h3>
+
+            <div class="flex justify-between items-center">
+                <span class="text-base font-bold text-amber-600 dark:text-amber-400">${formatCurrency(finalPrice)}</span>
+                <button class="add-to-cart-btn w-8 h-8 rounded-full bg-amber-500 text-white hover:bg-amber-600 transition flex items-center justify-center" data-id="${id}" aria-label="Add to cart">
+                    <i class="fas fa-plus text-xs"></i>
+                </button>
+            </div>
+
+            ${isCombo ? `
+            <div class="text-xs font-medium px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700 rounded-md shadow-sm">
+                ${combination_size} for ${formatCurrency(combination_price)}
+            </div>
+            ` : ''}
+        </div>
+
+        <!-- Quantity Controls -->
+        <div class="quantity-controls absolute bottom-4 left-1/2 transform -translate-x-1/2 transition-all duration-300 scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-lg flex items-center px-2 py-1 z-10" data-product-id="${id}">
+            <button class="decrease-qty w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center" data-id="${id}" aria-label="Decrease quantity">
+                <i class="fas fa-minus text-xs"></i>
+            </button>
+            <span class="quantity-counter mx-2 text-sm font-semibold text-gray-700 dark:text-gray-200 min-w-[20px] text-center">${cartQuantity}</span>
+        </div>
+    </div>
+    `;
+}).join('');
+
+
+
+            fragment.appendChild(cardTemplate);
+            grid.innerHTML = '';
+            grid.appendChild(fragment);
+            setupProductClickHandlers();
+        }
+
+        function renderCategories() {
+            if (state.categories.length > 0) {
+                elements.categoryTabs.innerHTML = `
+                    <div class="category-tabs-container relative">
+                        <div class="category-tabs-scroll flex space-x-2 md:space-x-3 pb-2 md:pb-3 overflow-x-auto scrollbar-hide px-1">
+                            <button class="category-tab relative px-4 py-1.5 md:px-6 md:py-2 rounded-lg md:rounded-full font-medium text-xs md:text-sm transition-all duration-200 ease-out bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm hover:shadow-md flex items-center group active:scale-[0.98]" data-id="all" aria-label="Show all products">
+                                <i class="fas fa-layer-group mr-1.5 md:mr-2 text-white/90 group-hover:text-white transition-all text-sm md:text-base"></i>
+                                <span>All</span>
+                                <span class="active-indicator absolute -bottom-0.5 md:-bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 md:w-8 md:h-1.5 bg-white rounded-full opacity-100"></span>
+                            </button>
+                            ${state.categories.map(category => `
+                                <button class="category-tab relative px-4 py-1.5 md:px-6 md:py-2 rounded-lg md:rounded-full font-medium text-xs md:text-sm transition-all duration-200 ease-out bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-300 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 flex items-center group active:scale-[0.98] shadow-xs hover:shadow-sm" data-id="${category.id}" aria-label="Show ${category.name} products">
+                                    ${category.icon ? `<i class="${category.icon} mr-1.5 md:mr-2 text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-all text-sm md:text-base"></i>` : ''}
+                                    <span class="whitespace-nowrap">${category.name.length > 12 ? category.name.substring(0, 10) + '...' : category.name}</span>
+                                    <span class="active-indicator absolute -bottom-0.5 md:-bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 md:w-8 md:h-1.5 bg-amber-500 rounded-full opacity-0 group-hover:opacity-30"></span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="scroll-fade-right absolute right-0 top-0 bottom-2 md:bottom-3 w-8 md:w-12 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none hidden"></div>
+                    </div>
+                `;
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const categoryId = tab.dataset.id;
+                        tab.classList.add('active');
+                        setTimeout(() => tab.classList.remove('active'), 200);
+                        setTimeout(() => filterProductsByCategory(categoryId), 50);
+                        updateActiveTabStyles(categoryId);
+                    });
+                });
+                setupScrollIndicators();
+            }
+        }
+
+        function updateActiveTabStyles(activeCategoryId) {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 'text-white', 'shadow-sm', 'border-amber-300', 'bg-amber-50', 'dark:bg-amber-900/20', 'text-amber-600', 'dark:text-amber-400');
+                tab.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-200', 'dark:border-gray-700', 'shadow-xs');
+                const indicator = tab.querySelector('.active-indicator');
+                if (indicator) {
+                    indicator.classList.remove('opacity-100', 'bg-white');
+                    indicator.classList.add('opacity-0', 'bg-amber-500');
+                }
+            });
+            const activeTab = document.querySelector(`.category-tab[data-id="${activeCategoryId}"]`);
+            if (activeTab) {
+                if (activeCategoryId === 'all') {
+                    activeTab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-200', 'dark:border-gray-700', 'shadow-xs');
+                    activeTab.classList.add('bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 'text-white', 'shadow-sm');
+                    const indicator = activeTab.querySelector('.active-indicator');
+                    if (indicator) {
+                        indicator.classList.remove('opacity-0', 'bg-amber-500');
+                        indicator.classList.add('opacity-100', 'bg-white');
+                    }
+                } else {
+                    activeTab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-200', 'dark:border-gray-700', 'shadow-xs');
+                    activeTab.classList.add('border-amber-300', 'bg-amber-50', 'dark:bg-amber-900/20', 'text-amber-600', 'dark:text-amber-400', 'shadow-sm');
+                    const indicator = activeTab.querySelector('.active-indicator');
+                    if (indicator) {
+                        indicator.classList.remove('opacity-0');
+                        indicator.classList.add('opacity-100');
+                    }
+                }
+            }
+        }
+
+        function setupScrollIndicators() {
+            const checkScroll = () => {
+                const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
+                const fadeRight = elements.categoryTabs.querySelector('.scroll-fade-right');
+                if (!container || !fadeRight) return;
+                const hasOverflow = container.scrollWidth > container.clientWidth;
+                fadeRight.classList.toggle('hidden', !hasOverflow);
+            };
+            checkScroll();
+            window.addEventListener('resize', checkScroll);
+            const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
+            if (container) {
+                container.addEventListener('scroll', checkScroll);
+            }
+        }
+
+        function filterProductsByCategory(categoryId) {
+            let filteredProducts = categoryId === 'all' ? state.products : state.products.filter(p => p.category_id == categoryId);
+            if (filteredProducts.length === 0) {
+                elements.productGrid.classList.add('hidden');
+                elements.productsEmptyState.classList.remove('hidden');
+                return;
+            }
+            elements.productGrid.classList.remove('hidden');
+            elements.productsEmptyState.classList.add('hidden');
+            const originalProducts = state.products;
+            state.products = filteredProducts;
+            renderProducts();
+            state.products = originalProducts;
+        }
+
+
+     // Cart Operations
+    function addToCart(productId) {
+    const now = Date.now();
+    if (state.lastAddedProductId === productId && (now - state.lastAddTime) < 500) {
+        return false;
+    }
+    state.lastAddedProductId = productId;
+    state.lastAddTime = now;
+
+    const product = state.products.find(p => p.id === productId);
+    if (!product) {
+        console.error(`Product ${productId} not found`);
+        return false;
+    }
+
+    const minUnit = product.minimum_unit || 1;
+    const availableStock = product.stock - getCurrentCartQuantity(productId);
+    if (availableStock < minUnit) {
+        showNotification(`"${product.name}" is out of stock`, 'error');
+        return false;
+    }
+
+    let existingItem = state.cart.find(item => item.product_id === productId);
+    let newQty = 0;
+
+    if (existingItem) {
+        const currentQty = existingItem.quantity;
+
+        if (currentQty < 1) {
+            newQty = +(currentQty + minUnit).toFixed(4);
+        } else {
+            newQty = currentQty + 1;
+        }
+
+        if (newQty > product.stock) {
+            showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
+            return false;
+        }
+
+        existingItem.quantity = newQty;
+    } else {
+        // First time add
+        const initialQty = Math.min(minUnit, product.stock);
+        state.cart.push({
+            product_id: product.id,
+            name: product.name,
+            price: product.price,
+            discount: product.discount || 0,
+            image_url: product.image_url,
+            quantity: initialQty,
+            is_combo: !!product.is_combo,
+            combination_size: product.combination_size || 0,
+            combination_price: product.combination_price || 0,
+            stock: product.stock,
+            unit: product.unit || '',
+            minimum_unit: minUnit
+        });
+    }
+
+    const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
+    if (productCard) {
+        productCard.classList.add('animate-cart-add');
+        setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
+    }
+
+    if (!state.isMobileView && state.cart.length === 1) {
+        state.cartVisible = true;
+    }
+
+    updateCartUI();
+    showNotification(`${product.name} added`, 'success');
+    return true;
+}
+
+
+        function removeFromCart(productId) {
+            const index = state.cart.findIndex(item => item.product_id === productId);
+            if (index === -1) return;
+            const removed = state.cart.splice(index, 1)[0];
+            if (state.cart.length === 0) {
+                hideCart();
+            }
+            updateCartUI();
+            showNotification(`Removed ${removed.name} from cart`, 'info');
+        }
+
+  function updateCartItemQuantity(productId, change) {
+    const cartItem = state.cart.find(item => item.product_id === productId);
+    if (!cartItem) return;
+
+    const minUnit = cartItem.minimum_unit || 1;
+    const currentQty = cartItem.quantity;
+    let newQty = currentQty;
+
+    if (change > 0) {
+        // INCREASE
+        if (currentQty < 1) {
+            newQty = +(currentQty + minUnit).toFixed(4);
+        } else {
+            newQty = currentQty + 1;
+        }
+    } else {
+        // DECREASE
+        if (currentQty > 1) {
+            newQty = currentQty - 1;
+        } else if (currentQty > minUnit) {
+            newQty = +(currentQty - minUnit).toFixed(4);
+        } else if (currentQty <= minUnit) {
+            // Remove item if it reaches minimum unit
+            removeFromCart(productId);
+            return;
+        }
+    }
+
+    // Ensure stock isn't exceeded
+    const product = state.products.find(p => p.id === productId);
+    if (newQty > product.stock) {
+        showNotification(`Only ${product.stock} available for "${cartItem.name}"`, 'error');
+        return;
+    }
+
+    cartItem.quantity = newQty;
+    updateCartUI();
+}
+
+
+        function getCurrentCartQuantity(productId) {
+            const item = state.cart.find(i => i.product_id === productId);
+            return item ? item.quantity : 0;
+        }
+
+
+function roundUpToNearestFive(amount) {
+    return Math.ceil(amount / 5) * 5;
+}
+
+
+    function calculateItemSubtotal(item) {
+    let rawSubtotal;
+
+    if (item.is_combo && item.combination_size > 1) {
+        const comboUnits = Math.floor(item.quantity / item.combination_size);
+        const remainder = item.quantity % item.combination_size;
+        const comboPrice = comboUnits * item.combination_price;
+        const remainderPrice = remainder * item.price;
+        rawSubtotal = comboPrice + Math.min(remainderPrice, item.combination_price);
+    } else {
+        rawSubtotal = item.quantity * item.price;
+    }
+
+    return roundUpToNearestFive(rawSubtotal);
+}
+
+
+        function calculateItemDiscount(item) {
+            if (!item.discount || item.discount <= 0) return 0;
+            return (item.price * item.quantity) * (item.discount / 100);
+        }
+
+
+
+
+        function calculateCartTotals() {
+            let subtotal = 0;
+            let discountTotal = 0;
+            for (const item of state.cart) {
+                subtotal += calculateItemSubtotal(item);
+                discountTotal += calculateItemDiscount(item);
+            }
+            const taxable = subtotal - discountTotal;
+            const tax = taxable * state.taxRate;
+            const total = taxable + tax;
+            return { subtotal, discount: discountTotal, taxable, tax, total };
+        }
+
+        function renderCartItems() {
+            const cart = state.cart;
+            elements.cartItems.innerHTML = '';
+            elements.emptyCart.classList.toggle('hidden', cart.length > 0);
+            if (cart.length === 0) {
+                elements.emptyCart.classList.remove('hidden');
+                return;
+            }
+            const fragment = document.createDocumentFragment();
+            cart.forEach((item, index) => {
+                const subtotal = calculateItemSubtotal(item);
+                const discount = calculateItemDiscount(item);
+                const isCombo = item.is_combo && item.combination_size > 1;
+                const itemEl = document.createElement('div');
+                itemEl.className = `cart-item flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm transition-all animate-cart-add`;
+                itemEl.dataset.id = item.product_id;
+                itemEl.style.animationDelay = `${index * 100}ms`;
+                itemEl.innerHTML = `
+                    <div class="w-12 h-12 flex items-center justify-center rounded-md bg-white border border-gray-300 overflow-hidden dark:bg-gray-700 dark:border-gray-600 shrink-0">
+                        ${item.image_url
+                            ? `<img src="${item.image_url}" alt="${item.name}" class="w-full h-full object-cover">`
+                            : `<span class="text-sm font-semibold text-gray-600 dark:text-gray-200">${item.name.slice(0, 2).toUpperCase()}</span>`
+                        }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-sm font-semibold text-gray-800 dark:text-white truncate">${item.name}</h4>
+                            <button class="remove-item text-red-500 hover:text-red-700 text-lg font-bold" aria-label="Remove item">×</button>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            ${formatCurrency(item.price)} each
+                            ${isCombo ? `<span class="ml-2 px-2 py-0.5 text-yellow-700 bg-yellow-100 rounded-full text-[11px]">${item.combination_size} for ${formatCurrency(item.combination_price)}</span>` : ''}
+                            ${item.discount > 0 ? `<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[11px]">${item.discount}% off</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="text-sm font-medium text-amber-600 dark:text-amber-400 min-w-[90px] text-right">
+                            ${formatCurrency(subtotal)}
+                            ${discount > 0 ? `<div class="text-xs text-green-600 dark:text-green-400 mt-1">Saved ${formatCurrency(discount)}</div>` : ''}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button class="decrease-qty w-7 h-7 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 flex items-center justify-center" aria-label="Decrease quantity">−</button>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-white min-w-[20px] text-center">${item.quantity}</span>
+                            <button class="increase-qty w-7 h-7 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 flex items-center justify-center" aria-label="Increase quantity">+</button>
+                        </div>
+                    </div>
+                `;
+                fragment.appendChild(itemEl);
+            });
+            elements.cartItems.appendChild(fragment);
+            attachCartItemEventListeners();
+            saveCartToLocalStorage();
+        }
+
+        function attachCartItemEventListeners() {
+            document.querySelectorAll('.cart-item').forEach(itemEl => {
+                const productId = parseInt(itemEl.dataset.id);
+                itemEl.querySelector('.decrease-qty')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateCartItemQuantity(productId, -1);
+                });
+                itemEl.querySelector('.increase-qty')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    updateCartItemQuantity(productId, 1);
+                });
+                itemEl.querySelector('.remove-item')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFromCart(productId);
+                });
+            });
+        }
+
+        function updateCartUI() {
+            const totals = calculateCartTotals();
+            elements.subtotalEl.textContent = formatCurrency(totals.subtotal);
+            elements.taxEl.textContent = formatCurrency(totals.tax);
+            elements.totalEl.textContent = formatCurrency(totals.total);
+            elements.completeSaleBtn.disabled = state.cart.length === 0;
+            
+            // Update cart item count
+            const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            elements.cartItemCount.textContent = itemCount;
+            elements.cartItemCount.classList.toggle('hidden', itemCount === 0);
+            
+            if (state.cart.length === 0) {
+                elements.emptyCart.classList.remove('hidden');
+                elements.cartItems.innerHTML = '';
+                if (state.isMobileView) {
+                    hideCart();
+                }
+            } else {
+                renderCartItems();
+                if (state.isMobileView && state.cartVisible) {
+                    showCart();
+                }
+            }
+            
+            // Update product quantity indicators
+            document.querySelectorAll('.quantity-counter').forEach(counter => {
+                const productId = parseInt(counter.closest('.quantity-controls').dataset.productId);
+                counter.textContent = getCurrentCartQuantity(productId);
+            });
+            
+            saveCartToLocalStorage();
+            document.dispatchEvent(new Event('cartUpdated'));
+        }
+
+        function showCart() {
+            state.cartVisible = true;
+            cartContainer.classList.remove('translate-y-full');
+            const toggleBtn = document.getElementById('cart-collapse-toggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                toggleBtn.classList.add('text-amber-400');
+            }
+        }
+
+        function hideCart() {
+            state.cartVisible = false;
+            cartContainer.classList.add('translate-y-full');
+            const toggleBtn = document.getElementById('cart-collapse-toggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+                toggleBtn.classList.remove('text-amber-400');
+            }
+        }
+
+        function setupProductClickHandlers() {
+            // Add to cart button click
+            elements.productGrid.addEventListener('click', (e) => {
+                const addBtn = e.target.closest('.add-to-cart-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const productId = parseInt(addBtn.dataset.id);
+                    addToCart(productId, 1);
+                    
+                    // Show quantity controls for this product
+                    state.activeProductId = productId;
+                    document.querySelectorAll('.quantity-controls').forEach(controls => {
+                        controls.classList.remove('opacity-100', 'scale-100');
+                    });
+                    const controls = addBtn.closest('.pos-card').querySelector('.quantity-controls');
+                    if (controls) {
+                        controls.classList.add('opacity-100', 'scale-100');
+                    }
+                    return;
+                }
+                
+                // Quantity control buttons
+                const qtyBtn = e.target.closest('.decrease-qty, .increase-qty');
+                if (qtyBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const productId = parseInt(qtyBtn.dataset.id);
+                    const isIncrease = qtyBtn.classList.contains('increase-qty');
+                    updateCartItemQuantity(productId, isIncrease ? 1 : -1);
+                    return;
+                }
+            });
+            
+            // Click outside to hide quantity controls
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.pos-card') && !e.target.closest('.quantity-controls')) {
+                    state.activeProductId = null;
+                    document.querySelectorAll('.quantity-controls').forEach(controls => {
+                        controls.classList.remove('opacity-100', 'scale-100');
+                    });
+                }
+            });
+        }
+
+        function clearCart() {
+            if (!state.cart.length) return;
+            const confirmed = confirm('Clear all items from cart?');
+            if (!confirmed) return;
+            state.cart = [];
+            hideCart();
+            updateCartUI();
+            showNotification('Cart cleared', 'success');
+        }
+
+        async function completeSale() {
+            if (!state.cart || state.cart.length === 0) {
+                showNotification('Cart is empty', 'error');
+                return;
+            }
+            if (!state.selectedPaymentMethod) {
+                showNotification('Please select a payment method', 'error');
+                return;
+            }
+            try {
+                showLoading('Completeing Checkout ...');
+                const payload = {
+                    payment_method: state.selectedPaymentMethod,
+                    cart_items: state.cart.map(item => ({
+                        product_id: item.product_id,
+                        quantity: item.quantity
+                    }))
+                };
+                const res = await axios.post(`${API_BASE_URL}/transactions`, payload, {
+                    timeout: 10000
+                });
+                if (!res.data?.success) {
+                    throw new Error('Unexpected server response');
+                }
+                state.cart = [];
+                state.cartVisible = false;
+                updateCartUI();
+                showNotification('Sale completed successfully!', 'success');
+            } catch (error) {
+                handleError('Sale failed', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function openConfirmSaleModal() {
+            if (!state.cart || state.cart.length === 0) {
+                showNotification('Cart is empty. Cannot proceed.', 'warning');
+                return;
+            }
+            const totals = calculateCartTotals();
+            const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            const paymentMethod = state.selectedPaymentMethod ? state.selectedPaymentMethod.charAt(0).toUpperCase() + state.selectedPaymentMethod.slice(1) : '—';
+            const summaryHTML = `
+                <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div class="flex justify-between">
+                        <span class="font-medium">Items:</span>
+                        <span>${itemCount}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium">Subtotal:</span>
+                        <span>${formatCurrency(totals.subtotal)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium">Tax (${(state.taxRate * 100)}%):</span>
+                        <span>${formatCurrency(totals.tax)}</span>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                        <div class="flex justify-between font-semibold">
+                            <span>Total:</span>
+                            <span class="text-lg text-green-700 dark:text-green-300">${formatCurrency(totals.total)}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-3">
+                        <span class="font-medium">Payment Method:</span>
+                        <span class="text-amber-600 dark:text-amber-400">${paymentMethod}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('confirm-sale-summary').innerHTML = summaryHTML;
+            showModal('confirm-sale-modal');
+        }
+
+        function setupPaymentMethods() {
+    elements.paymentMethods.addEventListener('click', (e) => {
+        const button = e.target.closest('.payment-method');
+        if (!button) return;
+        
+        // Reset UI for all
+        document.querySelectorAll('.payment-method').forEach(btn => {
+            const iconDiv = btn.querySelector('div:first-child');
+            const indicator = btn.querySelector('div:last-child');
+
+            iconDiv.classList.remove(
+                'bg-amber-100', 'dark:bg-amber-900/30',
+                'bg-green-100', 'dark:bg-green-900/30',
+                'text-amber-500', 'dark:text-amber-400',
+                'text-green-500', 'dark:text-green-400',
+                'bg-gray-100', 'dark:bg-gray-700',
+                'text-gray-500', 'dark:text-gray-400'
+            );
+            iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+            indicator.classList.remove('bg-amber-500', 'bg-green-500');
+            indicator.classList.add('bg-transparent');
+        });
+
+        // Highlight selected
+        const method = button.dataset.method;
+        const iconDiv = button.querySelector('div:first-child');
+        const indicator = button.querySelector('div:last-child');
+
+        if (method === 'pay_on_delivery') {
+            iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+            iconDiv.classList.add('bg-amber-100', 'dark:bg-amber-900/30', 'text-amber-500', 'dark:text-amber-400');
+            indicator.classList.remove('bg-transparent');
+            indicator.classList.add('bg-amber-500');
+        } else if (method === 'mobile') {
+            iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+            iconDiv.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400');
+            indicator.classList.remove('bg-transparent');
+            indicator.classList.add('bg-green-500');
+        }
+
+        state.selectedPaymentMethod = method;
+    });
+}
+
+
+
+
+
+
+//  Recent Transactions Modal 
+async function loadRecentTransactionsModal() {
+    const container = document.getElementById('recent-transactions-body');
+    
+    // Show elegant loading state
+    container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Loading recent orders...</p>
+        </div>
+    `;
+
+    try {
+        const res = await axios.get(`${API_BASE_URL}/transactions/recent`);
+        
+        if (!res.data || !Array.isArray(res.data)) {
+            throw new Error('Invalid response format');
+        }
+
+        const transactions = res.data;
+
+        if (transactions.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-history text-2xl text-gray-400 dark:text-gray-500"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-600 dark:text-gray-300 mb-1">No recent transactions</h4>
+                    <p class="text-gray-400 dark:text-gray-500 text-sm">Your recent orders will appear here</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Render transaction cards
+        container.innerHTML = `
+            <div class="space-y-4">
+                ${transactions.map(tx => `
+                    <div class="transaction-card group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                         data-id="${tx.id}"
+                         onclick="loadTransactionDetails('${tx.id}', this)">
+                        <div class="p-5 flex justify-between items-start">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">
+                                        Order #${tx.id}
+                                    </h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColorClass(tx.status)}">
+                                        ${tx.status}
+                                    </span>
+                                </div>
+                                
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center">
+                                        <i class="far fa-calendar mr-1.5"></i>
+                                        ${new Date(tx.date).toLocaleDateString()}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i class="far fa-clock mr-1.5"></i>
+                                        ${new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i class="far fa-user mr-1.5"></i>
+                                        ${tx.customer_name || 'Walk-in'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right ml-4 flex-shrink-0">
+                                <p class="text-xl font-bold text-amber-600 dark:text-amber-400">
+                                    ${formatCurrency(tx.total)}
+                                </p>
+                                <div class="mt-2 flex justify-end">
+                                    <button class="reorder-btn inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900 transition-all"
+                                            onclick="event.stopPropagation(); reorderTransaction('${tx.id}')">
+                                        <i class="fas fa-redo-alt mr-1.5 text-xs"></i>
+                                        Reorder
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="transaction-details hidden px-5 pb-5"></div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+    } catch (err) {
+        console.error('Transaction load error:', err);
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <div class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4 text-red-500 dark:text-red-400">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Failed to load transactions</h4>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">We couldn't load your recent orders</p>
+                <button onclick="loadRecentTransactionsModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Try Again
+                </button>
+            </div>
+        `;
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+    } else {
+        console.warn(`Modal with ID "${modalId}" not found.`);
+    }
+}
+
+
+
+// Load detailed transaction information when clicked
+async function loadTransactionDetails(txId, cardElement) {
+    const detailsEl = cardElement.querySelector('.transaction-details');
+    
+    // If already loaded, just toggle visibility
+    if (detailsEl.innerHTML) {
+        detailsEl.classList.toggle('hidden');
+        cardElement.classList.toggle('border-amber-400');
+        return;
+    }
+    
+    // Show loading state
+    detailsEl.innerHTML = `
+        <div class="flex justify-center py-6">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
+        </div>
+    `;
+    detailsEl.classList.remove('hidden');
+    cardElement.classList.add('border-amber-400');
+    
+    try {
+        const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
+        const tx = res.data;
+        
+        // Calculate price differences for display
+        const itemsWithPriceDiff = tx.items.map(item => {
+            const product = state.products.find(p => p.id === item.product_id);
+            const currentPrice = product ? product.selling_price : item.price;
+            return {
+                ...item,
+                price_diff: currentPrice - item.price,
+                current_price: currentPrice
+            };
+        });
+        
+        detailsEl.innerHTML = `
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-5 mt-2">
+               
+                
+                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                    <i class="fas fa-boxes text-amber-500 mr-2"></i>
+                    Order Items (${tx.items.length})
+                </h4>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto thin-scrollbar pr-2">
+                    ${itemsWithPriceDiff.map(item => `
+                        <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 hover:shadow-sm transition-shadow">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-16 w-16 bg-gray-100 dark:bg-gray-600 rounded-md overflow-hidden mr-4">
+                                    ${item.image_url ? `
+                                        <img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">
+                                    ` : `
+                                        <div class="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-300">
+                                            <i class="fas fa-box-open text-xl"></i>
+                                        </div>
+                                    `}
+                                </div>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">${item.name}</h5>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        ${item.quantity} 
+                                        ${item.discount > 0 ? `
+                                            <span class="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+                                                ${item.discount}% off
+                                            </span>
+                                        ` : ''}
+                                    </p>
+                                    
+                                   
+                                </div>
+                                
+                                <div class="ml-4 text-right">
+                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                                        ${formatCurrency(item.unit_price * item.quantity)}
+                                    </p>
+                                    ${item.discount > 0 ? `
+                                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                            Saved ${formatCurrency((item.price * item.quantity) * (item.discount/100))}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        detailsEl.innerHTML = `
+            <div class="text-center py-6">
+                <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-3 text-red-500 dark:text-red-400">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Failed to load order details</h4>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">${error.response?.data?.error || 'Please try again'}</p>
+                <button onclick="loadTransactionDetails('${txId}', this.closest('.transaction-card'))" 
+                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
+                    <i class="fas fa-sync-alt mr-1.5"></i>
+                    Retry
+                </button>
+            </div>
+        `;
+    } finally {
+        cardElement.classList.remove('border-amber-400');
+    }
+}
+
+//  reorder functionality with current prices
+async function reorderTransaction(txId) {
+    try {
+        showLoading('Preparing reorder...', 'Getting your order ready');
+        
+        const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
+        const tx = res.data;
+        
+        state.cart = []; // Clear current cart
+        
+        let addedCount = 0;
+        for (const item of tx.items) {
+            const product = state.products.find(p => p.id === item.product_id);
+            if (product) {
+                const success = reorderItem(product.id, item.quantity);
+                if (success) {
+                    addedCount++;
+                } else {
+                    showNotification(`"${product.name}" is out of stock`, 'warning');
+                }
+            }
+        }
+
+        hideLoading();
+
+        const modal = document.getElementById('recent-transactions-modal');
+        if (modal) modal.classList.add('hidden');
+        
+        if (addedCount > 0) {
+            showNotification(`Added ${addedCount} items to cart from order #${txId}`, 'success');
+            if (state.isMobileView) {
+                document.getElementById('cart-section')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        } else {
+            showNotification('No items could be added to cart', 'warning');
+        }
+
+    } catch (error) {
+        hideLoading();
+        showNotification('Failed to reorder. Please try again.', 'error');
+        console.error('Reorder error:', error);
+    }
+}
+
+
+// Helper function for status colors
+function getStatusColorClass(status) {
+    const statusMap = {
+        'completed': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
+        'pending': 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200',
+        'cancelled': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200',
+        'refunded': 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200',
+        'processing': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+    };
+    return statusMap[status.toLowerCase()] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+}
+
+
+
+
+function reorderItem(productId, quantity) {
+    const product = state.products.find(p => p.id === productId);
+    if (!product) {
+        console.error(`Product ${productId} not found`);
+        return false;
+    }
+
+    const currentQtyInCart = getCurrentCartQuantity(productId);
+    const availableStock = product.stock - currentQtyInCart;
+
+    if (availableStock < quantity) {
+        showNotification(`Only ${availableStock} available for "${product.name}"`, 'error');
+        return false;
+    }
+
+    let existingItem = state.cart.find(item => item.product_id === productId);
+
+    if (existingItem) {
+        const newQty = existingItem.quantity + quantity;
+
+        if (newQty > product.stock) {
+            showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
+            return false;
+        }
+
+        existingItem.quantity = newQty;
+    } else {
+        state.cart.push({
+            product_id: product.id,
+            name: product.name,
+            price: product.price,
+            discount: product.discount || 0,
+            image_url: product.image_url,
+            quantity: quantity,
+            is_combo: !!product.is_combo,
+            combination_size: product.combination_size || 0,
+            combination_price: product.combination_price || 0,
+            stock: product.stock,
+            unit: product.unit || '',
+            minimum_unit: product.minimum_unit || 1
+        });
+    }
+
+    const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
+    if (productCard) {
+        productCard.classList.add('animate-cart-add');
+        setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
+    }
+
+    if (!state.isMobileView && state.cart.length === 1) {
+        state.cartVisible = true;
+    }
+
+    updateCartUI();
+    return true;
+}
+
+
+
+
+    // ====================
+    // Product Search
+    // ====================
+    function setupProductSearch() {
+        let debounceTimer;
+        const searchInput = elements.productSearch;
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(async () => {
+                const query = searchInput.value.trim();
+                const categoryId = elements.categoryFilter?.value || null;
+
+                if (!query) {
+                    return loadProducts(); // Load full list on empty query
+                }
+
+                try {
+                    // Show skeleton only if we're *about to search*
+                    showSearchSkeleton();
+
+                    const response = await axios.post(`${API_BASE_URL}/products/search`, {
+                        query,
+                        category_id: categoryId
+                    }, {
+                        timeout: 3000
+                    });
+
+                    const products = response.data || [];
+
+                    state.products = products;
+
+                    if (products.length > 0) {
+                        renderProducts(products);
+                    } else {
+                        showNotification('No matching products found.', 'info');
+                        clearProductGrid(); // Optional: show empty state
+                    }
+
+                } catch (err) {
+                    console.warn('Search failed, using fallback:', err);
+                    showNotification('Search failed. Using fallback.', 'warning');
+                    fallbackSearch(query, categoryId);
+                } finally {
+                    hideSearchSkeleton();
+                }
+
+            }, 250); // debounce
+        });
+    }
+
+
+    function clearProductGrid() {
+        elements.productGrid.innerHTML = `
+        <div class="text-center text-gray-500 py-8 col-span-full">
+            <i class="fas fa-box-open text-3xl mb-2"></i>
+            <p>No products found.</p>
+        </div>
+    `;
+    }
+
+
+
+    function showSearchSkeleton(count = 8) {
+        const html = Array(count).fill(`
+        <div class="animate-pulse p-4 bg-white rounded shadow-sm">
+            <div class="h-24 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-300 w-3/4 mb-1"></div>
+            <div class="h-4 bg-gray-300 w-1/2"></div>
+        </div>
+    `).join('');
+        elements.productGrid.innerHTML = html;
+    }
+
+    function hideSearchSkeleton() {
+        // nothing to do; renderProducts will overwrite
+    }
+
+    function fallbackSearch(query, categoryId) {
+        const q = query.toLowerCase();
+        const results = state.products.filter(p => {
+            const matchName = p.name?.toLowerCase().includes(q);
+            const matchBarcode = p.barcode?.includes(query);
+            const matchSKU = p.sku?.includes(query);
+            const matchCategory = !categoryId || p.category_id == categoryId;
+
+            return (matchName || matchBarcode || matchSKU) && matchCategory;
+        });
+
+        renderProducts(results);
+    }
+
+
+        function setupCartToggles() {
+            const headerToggle = document.getElementById('cart-collapse-toggle');
+            const floatingToggle = document.getElementById('floating-cart-toggle');
+            
+            function toggleCartVisibility() {
+                state.cartVisible = !state.cartVisible;
+                if (state.cartVisible) {
+                    showCart();
+                } else {
+                    hideCart();
+                }
+            }
+            
+            headerToggle?.addEventListener('click', toggleCartVisibility);
+            floatingToggle?.addEventListener('click', toggleCartVisibility);
+        }
+
+        function errorFallbackUI() {
+            return `
+                <div class="error-fallback flex flex-col items-center justify-center p-6 text-center animate-fade-in col-span-full">
+                    <svg class="w-16 h-16 text-red-500 dark:text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" />
+                    </svg>
+                    <p class="text-gray-600 dark:text-gray-300 font-medium mb-3">Products unavailable</p>
+                    <button onclick="loadProducts()" class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-all shadow-sm" aria-label="Retry loading products">
+                        Retry
+                    </button>
+                </div>`;
+        }
+
+
+            document.querySelectorAll('.payment-method').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                const isDisabled = btn.dataset.disabled === 'true';
+                if (isDisabled) {
+                  e.preventDefault();
+                  // Replace below with your toast/alert logic
+                  alert('Mobile payment is coming soon!');
+                } else {
+                  // Proceed with selecting payment method
+                  const method = btn.dataset.method;
+                  // Your logic to activate payment...
+                }
+              });
+            });
+
+
+
+        // Event Listeners
+        function setupEventListeners() {
+            elements.clearCartBtn.addEventListener('click', clearCart);
+            elements.completeSaleBtn.addEventListener('click', () => openConfirmSaleModal());
+            document.getElementById('cancel-confirm-sale-btn').addEventListener('click', () => hideModal('confirm-sale-modal'));
+            document.getElementById('confirm-complete-sale').addEventListener('click', async () => {
+                hideModal('confirm-sale-modal');
+                await completeSale();
+            });
+            setupCartToggles();
+            setupPaymentMethods();
+            setupProductSearch();
+            
+            window.addEventListener('resize', () => {
+                state.isMobileView = window.innerWidth < 1024;
+                updateCartUI();
+            });
+            
+            // Prevent cart from closing when interacting with it
+            document.querySelector('#cart-container').addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initPOS();
+            setupEventListeners();
+        });
+    </script>
+{% endblock %}

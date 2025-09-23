@@ -1,0 +1,134 @@
+<!-- templates/bhapos/tenants/url_settings.html -->
+<div class="space-y-6 max-w-3xl mx-auto">
+  <!-- Header Section -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white/90 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+      Registration Link Settings
+    </h2>
+    {% if shop.allow_registrations %}
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <span class="w-2 h-2 mr-1.5 rounded-full bg-green-500 animate-pulse"></span>
+        Active
+      </span>
+    {% else %}
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <span class="w-2 h-2 mr-1.5 rounded-full bg-red-500"></span>
+        Inactive
+      </span>
+    {% endif %}
+  </div>
+
+  {% if current_user.is_tenant() %}
+    <!-- Toggle Registration Card -->
+    <div class="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md">
+      <div class="p-5 flex items-center justify-between">
+        <div>
+          <h3 class="font-medium text-gray-800 dark:text-white/90">Registration Status</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {% if shop.allow_registrations %}
+              New users can currently register for your shop
+            {% else %}
+              Registration is currently closed for your shop
+            {% endif %}
+          </p>
+        </div>
+        <form method="POST" action="{{ url_for('bhapos.toggle_registrations', shop_id=shop.id) }}">
+          <button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors 
+            {% if shop.allow_registrations %}bg-indigo-600{% else %}bg-gray-200 dark:bg-gray-600{% endif %}">
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform 
+              {% if shop.allow_registrations %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if shop.allow_registrations %}
+    <!-- Permanent URL Card -->
+    <div class="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md">
+      <div class="p-5 space-y-3">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <h3 class="font-medium text-gray-800 dark:text-white/90">Permanent Registration URL</h3>
+        </div>
+        
+        <div class="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          <input type="text" readonly
+                 value="{{ url_for('auth.register_user', shop_slug=shop.slug, _external=True) }}"
+                 class="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 text-sm text-gray-800 dark:text-gray-200 focus:outline-none truncate">
+          <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value); 
+                          this.innerHTML = 'Copied!';
+                          setTimeout(() => { this.innerHTML = 'Copy'; }, 2000);"
+                  class="px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
+            Copy
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Share this link to allow new users to register for your shop</p>
+      </div>
+    </div>
+
+    <!-- Short URL Card (if exists) -->
+    {% if shop.short_url_code %}
+      <div class="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md">
+        <div class="p-5 space-y-3">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            <h3 class="font-medium text-gray-800 dark:text-white/90">Short Registration URL</h3>
+          </div>
+          
+          <div class="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <input type="text" readonly
+                   value="{{ url_for('auth.short_register', code=shop.short_url_code, _external=True) }}"
+                   class="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 text-sm text-gray-800 dark:text-gray-200 focus:outline-none truncate">
+            <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value);
+                            this.innerHTML = 'Copied!';
+                            setTimeout(() => { this.innerHTML = 'Copy'; }, 2000);"
+                    class="px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
+              Copy
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Easy-to-share shortened version of your registration URL</p>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if current_user.is_tenant() %}
+      <!-- Generate Short URL Button -->
+      <form method="POST"
+            action="{{ url_for('auth.generate_short_url', shop_id=shop.id) }}"
+            hx-post="{{ url_for('auth.generate_short_url', shop_id=shop.id) }}"
+            hx-target="#main-content"
+            hx-swap="innerHTML transition:true">
+        <button type="submit"
+                class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md transition-all transform hover:scale-[1.01] flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Generate Short URL
+        </button>
+      </form>
+    {% endif %}
+  {% else %}
+    <!-- Warning Alert -->
+    <div class="bg-yellow-50/80 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded-r-lg shadow-sm">
+      <div class="flex items-start">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Registrations Restricted</h3>
+          <div class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+            <p>User registrations are currently disabled for this shop. Enable registrations above to generate and share registration links.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>

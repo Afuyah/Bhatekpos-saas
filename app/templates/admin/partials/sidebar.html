@@ -1,0 +1,386 @@
+<div id="sidebar" class="fixed md:relative z-40 w-72 h-full flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-xl transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out">
+  
+  <!-- Sidebar Header with Business Info -->
+  <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+    <div class="flex items-center space-x-3 min-w-0">
+      <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+        {{ business.name[0]|upper }}
+      </div>
+      <div class="min-w-0">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white truncate">{{ business.name }}</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Admin Dashboard</p>
+      </div>
+    </div>
+    <!-- Collapse Button (Desktop) -->
+    <button id="sidebar-collapse" class="hidden md:flex p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle sidebar">
+      <svg class="h-5 w-5 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Shop Status Bar -->
+  <div class="px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 bg-blue-50/50 dark:bg-blue-900/20">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="h-8 w-8 rounded-md bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center">
+          <i class="fas fa-store text-sm text-blue-600 dark:text-blue-400"></i>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{{ current_shop.name }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+            <span>{{ now.strftime('%b %d, %Y') }}</span>
+            <span class="mx-1.5">•</span>
+            <span>{{ now.strftime('%I:%M %p') }}</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1.5 px-2 py-1 bg-white dark:bg-gray-800 rounded-md shadow-xs">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Live</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 overflow-y-auto overscroll-contain py-3 px-2 space-y-1" aria-label="Main navigation">
+    <!-- Dashboard -->
+    <div>
+      <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+         hx-get="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+         hx-target="#main-content"
+         hx-swap="innerHTML transition:true"
+         hx-push-url="true"
+         hx-indicator="#htmx-loader"
+         class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800/90 relative">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mr-3 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+          <i class="fas fa-tachometer-alt text-blue-600 dark:text-blue-400 text-sm"></i>
+        </div>
+        <span class="truncate">Dashboard</span>
+        <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+        </span>
+      </a>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div class="px-3 pt-5 pb-1">
+      <h4 class="text-[0.7rem] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Access</h4>
+    </div>
+    <div class="grid grid-cols-2 gap-2 px-2">
+      <a href="#"
+         hx-get="{{ url_for('inventory.new_product_form_fragment',shop_id=current_shop.id) }}"
+         hx-target="#main-content"
+         hx-swap="innerHTML transition:true"
+         hx-push-url="true"
+         hx-indicator="#htmx-loader"
+         class="flex flex-col items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-1.5">
+          <i class="fas fa-plus text-blue-600 dark:text-blue-400 text-xs"></i>
+        </div>
+        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">New Product</span>
+      </a>
+      <a href="{{ url_for('sales.sales_screen', shop_id=current_shop.id) }}"
+                    onclick="window.location.href=this.href; return false;"
+    
+         class="flex flex-col items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <div class="w-8 h-8 rounded-md bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-1.5">
+          <i class="fas fa-cash-register text-green-600 dark:text-green-400 text-xs"></i>
+        </div>
+        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">POS Terminal</span>
+      </a>
+    </div>
+
+    <!-- Main Navigation Sections -->
+    <div class="space-y-1 pt-2">
+      <!-- Inventory Section -->
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/90 transition-colors">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mr-3">
+              <i class="fas fa-warehouse text-purple-600 dark:text-purple-400 text-sm"></i>
+            </div>
+            <span>Inventory</span>
+          </div>
+          <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+        </button>
+        <div x-show="open" @click.outside="open = false" class="pl-11 pr-3 pt-1 space-y-1" style="display: none;">
+          <a href="{{ url_for('inventory.products', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('inventory.products', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Products
+            </span>
+          </a>
+          <a href="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Categories
+            </span>
+          </a>
+          <a href="{{ url_for('price.price_fragment', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('price.price_fragment', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Pricing
+            </span>
+          </a>
+          <a href="{{ url_for('inventory.stock_logs', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('inventory.stock_logs', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Stock Logs
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Sales & Reports Section -->
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/90 transition-colors">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center mr-3">
+              <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-sm"></i>
+            </div>
+            <span>Sales & Reports</span>
+          </div>
+          <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+        </button>
+        <div x-show="open" @click.outside="open = false" class="pl-11 pr-3 pt-1 space-y-1" style="display: none;">
+          <a href="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Daily Sales
+            </span>
+          </a>
+          <a href="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Weekly Reports
+            </span>
+          </a>
+          <a href="{{ url_for('reports.monthly_sales_analytics', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('reports.monthly_sales_analytics', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Monthly Analytics
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- System Section -->
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/90 transition-colors">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center mr-3">
+              <i class="fas fa-cog text-orange-600 dark:text-orange-400 text-sm"></i>
+            </div>
+            <span>System</span>
+          </div>
+          <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+        </button>
+        <div x-show="open" @click.outside="open = false" class="pl-11 pr-3 pt-1 space-y-1" style="display: none;">
+          <a href="{{ url_for('auth.user_management', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('auth.user_management', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              User Management
+            </span>
+          </a>
+          <a href="{{ url_for('auth.url_settings_partial', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('auth.url_settings_partial', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Url Settings
+            </span>
+          </a>
+          <a href="#"
+             hx-get="#"
+             hx-target="#main-content"
+             hx-swap="innerHTML transition:true"
+             hx-push-url="true"
+             hx-indicator="#htmx-loader"
+             class="block px-3 py-2 text-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <span class="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-gray-400 dark:before:bg-gray-500">
+              Integrations
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help & Support Section -->
+    <div class="pt-4">
+      <a href="#"
+         hx-get="#"
+         hx-target="#main-content"
+         hx-swap="innerHTML transition:true"
+         hx-push-url="true"
+         hx-indicator="#htmx-loader"
+         class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800/90 relative">
+        <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-3 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+          <i class="fas fa-question-circle text-gray-600 dark:text-gray-400 text-sm"></i>
+        </div>
+        <span class="truncate">Help & Support</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- User Profile Footer -->
+  <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+    <div class="flex items-center space-x-3">
+      <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shadow-md flex-shrink-0">
+        {{ current_user.username[0]|upper }}
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ current_user.username }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ current_user.role.name }}</p>
+      </div>
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" class="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="User options">
+          <i class="fas fa-ellipsis-v text-sm"></i>
+        </button>
+        <!-- User dropdown menu -->
+        <div x-show="open" @click.outside="open = false" class="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700" style="display: none;">
+          <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Your Profile</a>
+          <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+          <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+          <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button id="mobile-menu-button" class="md:hidden fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+  <i class="fas fa-bars text-xl transition-transform" id="menu-icon"></i>
+</button>
+
+<!-- Mobile Overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
+
+<!-- HTMX Loading Indicator -->
+<div id="htmx-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
+  <div class="flex flex-col items-center">
+    <div class="relative">
+      <div class="h-12 w-12 rounded-full border-4 border-blue-200 dark:border-blue-900/50"></div>
+      <div class="absolute top-0 left-0 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+    </div>
+    <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">Loading content...</p>
+  </div>
+</div>
+
+<!-- Alpine.js for dropdown functionality -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu toggle
+  const sidebar = document.getElementById('sidebar');
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const menuIcon = document.getElementById('menu-icon');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  mobileMenuButton.addEventListener('click', () => {
+    const isOpen = sidebar.classList.contains('translate-x-0');
+    
+    // Show overlay only during transition
+    if (!isOpen) {
+      overlay.classList.remove('pointer-events-none');
+      overlay.classList.add('opacity-100');
+      
+      // Hide overlay after transition completes
+      setTimeout(() => {
+        overlay.classList.add('pointer-events-none');
+        overlay.classList.remove('opacity-100');
+      }, 300); // Match this with your transition duration
+    }
+    
+    sidebar.classList.toggle('translate-x-0', !isOpen);
+    sidebar.classList.toggle('-translate-x-full', isOpen);
+    menuIcon.classList.toggle('fa-bars', isOpen);
+    menuIcon.classList.remove('fa-times', !isOpen);
+  });
+
+  // Close sidebar when clicking on overlay (if visible)
+  overlay.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+    sidebar.classList.remove('translate-x-0');
+    overlay.classList.add('opacity-0', 'pointer-events-none');
+    menuIcon.classList.add('fa-bars');
+    menuIcon.classList.remove('fa-times');
+  });
+
+
+
+// HTMX loading indicators
+function initHTMXLoaders() {
+  const loader = document.getElementById('htmx-loader');
+  
+  document.addEventListener('htmx:beforeRequest', function(evt) {
+    if (evt.detail.target.id === 'main-content') {
+      loader.classList.remove('opacity-0', 'pointer-events-none');
+    }
+  });
+  
+  document.addEventListener('htmx:afterRequest', function(evt) {
+    loader.classList.add('opacity-0', 'pointer-events-none');
+  });
+  
+  document.addEventListener('htmx:afterOnLoad', function(evt) {
+    if (evt.detail.failed) {
+      showToast('Request failed. Please try again.', 'error');
+    }
+  });
+}
+
+// Toast notification (placeholder, implement as needed)
+function showToast(message, type) {
+  console.log(`${type}: ${message}`);
+  // Implement a proper toast notification system here
+}
+</script>
