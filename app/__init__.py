@@ -129,9 +129,6 @@ def create_app(config_class=Config):
     # -----------------------
     db.init_app(app)
     migrate.init_app(app, db)
-    socketio.init_app(app, 
-                 cors_allowed_origins=['https://yourdomain.com', 'http://127.0.0.1:5000'],
-                 async_mode='threading')
     login_manager.init_app(app)
     cache.init_app(app)
     csrf.init_app(app)
