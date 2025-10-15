@@ -48,3 +48,5 @@ flask_wtf
 email_validator
 sqlalchemy-utils
 python-slugify
+gevent 
+gevent-websocket
