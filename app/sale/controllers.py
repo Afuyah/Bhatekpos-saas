@@ -122,7 +122,7 @@ class TransactionController(MethodView):
     def get(self, shop_id, transaction_id=None):
         try:
             if request.path.endswith('/recent'):
-                limit = min(int(request.args.get('limit', 1)), 10)  # Max 10 transactions
+                limit = min(int(request.args.get('limit', 4)), 10)  
                 transactions = self._get_recent_transactions(shop_id, limit)
                 return self._format_recent_transactions(transactions)
 

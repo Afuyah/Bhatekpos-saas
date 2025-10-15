@@ -42,18 +42,18 @@
                 <li>
                     <a href="#" class="w-full flex items-center space-x-3 p-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 transition-all group" title="Browse Products" aria-label="Shop Now">
                         <div class="w-10 h-10 rounded-full bg-amber-500/30 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/40 transition-colors">
-                            <i class="fas fa-store text-base"></i> <!-- Changed icon -->
+                            <i class="fas fa-store text-base"></i> 
                         </div>
-                        <span class="text-sm text-white">Shop Now</span> <!-- Changed from "New Sale" -->
+                        <span class="text-sm text-white">Shop Now</span> 
                         <span class="ml-auto px-2 py-1 bg-amber-400 text-gray-900 text-xs rounded-full">Active</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="loadRecentTransactionsModal(); document.getElementById('recent-transactions-modal').classList.remove('hidden')"  class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Order History" aria-label="My Orders">
+                    <a href="#" onclick="loadRecentTransactionsModal(); document.getElementById('recent-transactions-modal').classList.remove('hidden')"  class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Sales History" aria-label="My sales">
                         <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-history text-base"></i> <!-- Changed icon -->
+                            <i class="fas fa-history text-base"></i>
                         </div>
-                        <span class="text-sm text-white">My Orders</span> <!-- Changed from "History" -->
+                        <span class="text-sm text-white">Sales History</span> 
                     </a>
                 </li>
             </ul>
@@ -125,7 +125,7 @@
             </button>
             <div class="notification-dropdown hidden absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 z-40">
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                    <h3 class="font-semibold text-gray-800 dark:text-gray-100">Order Updates</h3> <!-- Changed from "Notifications" -->
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-100">Sale Updates</h3> 
                     <button class="text-sm text-amber-500 hover:text-amber-600" aria-label="Mark all as read">Clear All</button>
                 </div>
                 <div class="p-4 text-center text-gray-500 dark:text-gray-400">
@@ -241,7 +241,7 @@ document.addEventListener('click', (e) => {
                 <i class="fas fa-chevron-up"></i>
             </button>
             <h3 class="text-lg font-semibold flex items-center gap-2">
-                <i class="fas fa-receipt"></i> Your Order
+                <i class="fas fa-receipt"></i> cart
                 
             </h3>
         </div>
@@ -369,7 +369,7 @@ document.addEventListener('click', (e) => {
     <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
       <div>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed view of all transactions</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed view of last 5 transactions</p>
       </div>
       <button onclick="document.getElementById('recent-transactions-modal').classList.add('hidden')" 
               class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
@@ -1688,7 +1688,7 @@ async function loadTransactionDetails(txId, cardElement) {
                 
                 <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                     <i class="fas fa-boxes text-amber-500 mr-2"></i>
-                    Order Items (${tx.items.length})
+                    Sale Items (${tx.items.length})
                 </h4>
                 
                 <div class="space-y-3 max-h-96 overflow-y-auto thin-scrollbar pr-2">
@@ -1741,7 +1741,7 @@ async function loadTransactionDetails(txId, cardElement) {
                 <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-3 text-red-500 dark:text-red-400">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
-                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Failed to load order details</h4>
+                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Failed to load Sale details</h4>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">${error.response?.data?.error || 'Please try again'}</p>
                 <button onclick="loadTransactionDetails('${txId}', this.closest('.transaction-card'))" 
                         class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
@@ -1758,7 +1758,7 @@ async function loadTransactionDetails(txId, cardElement) {
 //  reorder functionality with current prices
 async function reorderTransaction(txId) {
     try {
-        showLoading('Preparing reorder...', 'Getting your order ready');
+        showLoading('Preparing reorder...', 'Getting your Sale ready');
         
         const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
         const tx = res.data;
@@ -1784,7 +1784,7 @@ async function reorderTransaction(txId) {
         if (modal) modal.classList.add('hidden');
         
         if (addedCount > 0) {
-            showNotification(`Added ${addedCount} items to cart from order #${txId}`, 'success');
+            showNotification(`Added ${addedCount} items to cart from Sale #${txId}`, 'success');
             if (state.isMobileView) {
                 document.getElementById('cart-section')?.scrollIntoView({ 
                     behavior: 'smooth',

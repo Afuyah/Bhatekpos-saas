@@ -296,11 +296,10 @@ class Business(BaseModel):
 class Shop(BaseModel, BusinessScopedMixin):
     __tablename__ = 'shops'
     __table_args__ = (
-        db.Index('ix_shops_business_id', 'business_id'),  
+        db.Index('ix_shops_business_id', 'business_id'),
         db.Index('ix_shops_name', 'name'),
         db.Index('ix_shops_phone', 'phone'),
         db.Index('ix_shops_is_active', 'is_active'),
-        {'extend_existing': True}  
     )
 
     name = db.Column(db.String(150), nullable=False)
@@ -312,63 +311,54 @@ class Shop(BaseModel, BusinessScopedMixin):
     allow_registrations = db.Column(db.Boolean, default=True)
     logo_url = db.Column(db.String(255), nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    type = db.Column(SQLAlchemyEnum(ShopType), nullable=True)  
+    type = db.Column(SQLAlchemyEnum(ShopType), nullable=True)
     short_url_code = db.Column(db.String(10), unique=True, nullable=True)
 
-    # Rest of your model relationships and methods...
+    # Relationships
     register_sessions = db.relationship('RegisterSession', back_populates='shop', cascade='all, delete-orphan')
-    # Optimized relationships with explicit join conditions and load strategies
-    users = db.relationship( 'User', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic'  )
-    price_changes = db.relationship('PriceChange', back_populates='shop', cascade="all, delete-orphan")    
-    products = db.relationship( 'Product',  back_populates='shop', cascade="all, delete-orphan", lazy='dynamic',   order_by='Product.name' )    
-    sales = db.relationship('Sale', back_populates='shop',  cascade="all, delete-orphan", lazy='dynamic', order_by='Sale.created_at.desc()')    
-    categories = db.relationship('Category',  back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Category.name' )    
-    cart_items = db.relationship('CartItem',  back_populates='shop', cascade="all, delete-orphan",  lazy='dynamic')
-
-    # Other relationships with optimized loading
-    suppliers = db.relationship( 'Supplier', back_populates='shop', cascade="all, delete-orphan",  lazy='dynamic', order_by='Supplier.name' )    
-    expenses = db.relationship( 'Expense',  back_populates='shop',  cascade="all, delete-orphan",  lazy='dynamic', order_by='Expense.date.desc()')
-
-    user_addresses = db.relationship( 'UserAddress',  back_populates='shop',  cascade="all, delete-orphan",  lazy='dynamic')
-
-    # Added bulk operations for stock logs
-    stock_logs = db.relationship('StockLog', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='StockLog.created_at.desc()'
+    users = db.relationship('User', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic')
+    price_changes = db.relationship('PriceChange', back_populates='shop', cascade="all, delete-orphan")
+    products = db.relationship('Product', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Product.name')
+    sales = db.relationship('Sale', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Sale.created_at.desc()')
+    categories = db.relationship('Category', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Category.name')
+    cart_items = db.relationship('CartItem', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic')
+    suppliers = db.relationship('Supplier', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Supplier.name')
+    expenses = db.relationship('Expense', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Expense.date.desc()')
+    user_addresses = db.relationship('UserAddress', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic')
+    stock_logs = db.relationship('StockLog', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='StockLog.created_at.desc()')
+    taxes = db.relationship('Tax', back_populates='shop', cascade="all, delete-orphan", lazy='selectin', order_by='Tax.name')
+    shop_homepage_settings = db.relationship(
+        'ShopHomepageSettings',
+        back_populates='shop',
+        uselist=False,
+        cascade='all, delete-orphan'
     )
-    # Tax relationship with optimized loading
-    taxes = db.relationship( 'Tax',  back_populates='shop', cascade="all, delete-orphan",  lazy='selectin',  order_by='Tax.name')
-
+    shop_adverts = db.relationship(  # Renamed from adverts to shop_adverts
+        'ShopAdvert',
+        back_populates='shop',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+        order_by='ShopAdvert.display_order'
+    )
 
     def __repr__(self):
         return f"<Shop {self.name} (ID: {self.id})>"
 
-
+    @staticmethod
     def generate_unique_slug(name):
+        """Generate a unique slug from the shop name"""
         base_slug = slugify(name)
         slug = base_slug
-        index = 1
-
         while Shop.query.filter_by(slug=slug).first():
-            slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"  # or use increment
-
-        return slug    
-
-
+            slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
+        return slug
 
     def get_registration_url(self):
+        """Generate registration URL for the shop"""
         return url_for("auth.register_user", shop_slug=self.slug, _external=True)
 
-        
-
-
     def serialize(self, include_relations=None):
-        """
-        Enhanced serialization with configurable relation inclusion
-        and optimized query patterns.
-        
-        Args:
-            include_relations (list): Optional list of relations to include
-                ('taxes', 'categories', etc.)
-        """
+        """Enhanced serialization with configurable relation inclusion"""
         data = {
             'id': self.id,
             'name': self.name,
@@ -381,8 +371,7 @@ class Shop(BaseModel, BusinessScopedMixin):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
-        
-        # Dynamic relation inclusion
+
         if include_relations:
             for relation in include_relations:
                 if relation == 'taxes':
@@ -391,31 +380,32 @@ class Shop(BaseModel, BusinessScopedMixin):
                     data['categories'] = [c.serialize() for c in self.categories.all()]
                 elif relation == 'stats':
                     data.update(self.get_business_stats())
-        
+                elif relation == 'shop_homepage_settings':
+                    data['shop_homepage_settings'] = self.shop_homepage_settings.serialize() if self.shop_homepage_settings else None
+                elif relation == 'shop_adverts':  # Updated to match relationship name
+                    data['shop_adverts'] = [advert.serialize() for advert in self.shop_adverts]
+
         return data
 
     def get_business_stats(self):
-        """
-        Get key business statistics with optimized queries
-        """
+        """Get key business statistics with optimized queries"""
         from sqlalchemy import func
-        
         return {
             'product_count': self.products.count(),
             'active_product_count': self.products.filter_by(is_active=True).count(),
             'category_count': self.categories.count(),
             'sale_count': self.sales.count(),
             'revenue_30days': db.session.query(
-                func.sum(Sale.total_amount)
+                func.sum(Sale.total)
             ).filter(
                 Sale.shop_id == self.id,
-                Sale.created_at >= func.date_sub(func.now(), {'days': 30})
+                Sale.created_at >= func.date_sub(func.now(), text('interval 30 days'))
             ).scalar() or 0
         }
 
     @classmethod
     def find_by_name(cls, business_id, name):
-       
+        """Find a shop by name and business_id"""
         return cls.query.filter(
             cls.business_id == business_id,
             func.lower(cls.name) == func.lower(name)
@@ -423,21 +413,174 @@ class Shop(BaseModel, BusinessScopedMixin):
 
     @classmethod
     def search(cls, business_id, query, limit=10):
-        """
-        Full-text search implementation
-        """
+        """Full-text search for shops by name"""
         return cls.query.filter(
             cls.business_id == business_id,
             cls.name.ilike(f'%{query}%')
         ).limit(limit).all()
 
     def deactivate(self):
-        """
-        Soft delete implementation
-        """
+        """Soft deactivate the shop"""
         self.is_active = False
-        db.session.commit()
-        return self   
+        return self.save()
+
+    @validates('email')
+    def validate_email(self, key, email):
+        if email and '@' not in email:
+            raise ValueError("Invalid email format")
+        return email
+
+    @validates('phone')
+    def validate_phone(self, key, phone):
+        if phone and not phone.replace('+', '').isdigit():
+            raise ValueError("Phone must contain only digits and optional '+'")
+        return phone
+
+    def before_save(self):
+        """Ensure slug is set before saving"""
+        if not self.slug:
+            self.slug = self.generate_unique_slug(self.name)
+
+class ShopHomepageSettings(BaseModel, ShopScopedMixin):
+    __tablename__ = 'shop_homepage_settings'
+    
+    # Branding
+    shop_name = db.Column(db.String(200), nullable=False)
+    tagline = db.Column(db.String(300))
+    primary_color = db.Column(db.String(7), default='#10b981')
+    secondary_color = db.Column(db.String(7), default='#059669')
+    
+    # Content
+    hero_title = db.Column(db.Text)
+    hero_description = db.Column(db.Text)
+    announcement_text = db.Column(db.Text)
+    special_offer = db.Column(db.Text)
+    
+    # Features
+    feature_1_title = db.Column(db.String(100))
+    feature_1_description = db.Column(db.Text)
+    feature_2_title = db.Column(db.String(100))
+    feature_2_description = db.Column(db.Text)
+    
+    # Stats
+    customer_count = db.Column(db.String(50), default='400+')
+    delivery_area = db.Column(db.String(100))
+    dispatch_time = db.Column(db.String(50))
+    
+    # Media
+    logo_url = db.Column(db.String(500))
+    favicon_url = db.Column(db.String(500))
+    
+    # SEO
+    meta_title = db.Column(db.String(200))
+    meta_description = db.Column(db.Text)
+    
+    # URL Scoping
+    subdomain = db.Column(db.String(100), unique=True, index=True)
+    custom_domain = db.Column(db.String(255), unique=True, index=True)
+    
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # Indexes
+    __table_args__ = (
+        db.Index('ix_homepage_subdomain', 'subdomain'),
+        db.Index('ix_homepage_custom_domain', 'custom_domain'),
+        db.Index('ix_homepage_shop_active', 'shop_id', 'is_active'),
+    )
+
+    def generate_subdomain(self):
+        """Generate a unique subdomain from shop name"""
+        if not self.subdomain and self.shop_name:
+            base_subdomain = slugify(self.shop_name)
+            subdomain = base_subdomain
+            counter = 1
+            
+            while ShopHomepageSettings.query.filter_by(subdomain=subdomain).first():
+                subdomain = f"{base_subdomain}-{counter}"
+                counter += 1
+            
+            self.subdomain = subdomain
+        return self.subdomain
+
+    def serialize(self):
+        """Serialize homepage settings for API responses"""
+        return {
+            'id': self.id,
+            'shop_id': self.shop_id,
+            'shop_name': self.shop_name,
+            'tagline': self.tagline,
+            'primary_color': self.primary_color,
+            'secondary_color': self.secondary_color,
+            'hero_title': self.hero_title,
+            'hero_description': self.hero_description,
+            'announcement_text': self.announcement_text,
+            'special_offer': self.special_offer,
+            'feature_1_title': self.feature_1_title,
+            'feature_1_description': self.feature_1_description,
+            'feature_2_title': self.feature_2_title,
+            'feature_2_description': self.feature_2_description,
+            'customer_count': self.customer_count,
+            'delivery_area': self.delivery_area,
+            'dispatch_time': self.dispatch_time,
+            'logo_url': self.logo_url,
+            'favicon_url': self.favicon_url,
+            'meta_title': self.meta_title,
+            'meta_description': self.meta_description,
+            'subdomain': self.subdomain,
+            'custom_domain': self.custom_domain,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+class ShopAdvert(BaseModel, ShopScopedMixin):
+    __tablename__ = 'shop_adverts'
+    
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text)
+    image_url = db.Column(db.String(500))
+    button_text = db.Column(db.String(50))
+    button_link = db.Column(db.String(500))
+    is_active = db.Column(db.Boolean, default=True)
+    display_order = db.Column(db.Integer, default=0)
+    
+    start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
+    
+    # Indexes
+    __table_args__ = (
+        db.Index('ix_adverts_shop_active', 'shop_id', 'is_active'),
+        db.Index('ix_adverts_dates', 'start_date', 'end_date'),
+    )
+
+    @property
+    def is_currently_active(self):
+        """Check if advert is currently active based on dates"""
+        now = datetime.utcnow()
+        if self.start_date and self.start_date > now:
+            return False
+        if self.end_date and self.end_date < now:
+            return False
+        return self.is_active
+
+    def serialize(self):
+        """Serialize advert for API responses"""
+        return {
+            'id': self.id,
+            'shop_id': self.shop_id,
+            'title': self.title,
+            'content': self.content,
+            'image_url': self.image_url,
+            'button_text': self.button_text,
+            'button_link': self.button_link,
+            'is_active': self.is_active,
+            'display_order': self.display_order,
+            'start_date': self.start_date.isoformat() if self.start_date else None,
+            'end_date': self.end_date.isoformat() if self.end_date else None,
+            'is_currently_active': self.is_currently_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 
 class RegisterSession(BaseModel, ShopScopedMixin):
