@@ -10,7 +10,7 @@
     <div class="p-5 border-b border-gray-700 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                <i class="fas fa-store text-white text-lg"></i> <!-- Changed icon to "store" -->
+                <i class="fas fa-store text-white text-lg"></i>
             </div>
             <h3 class="text-xl font-bold text-amber-300 truncate">{{ current_shop.name }}</h3>
         </div>
@@ -29,7 +29,7 @@
         </div>
         <div>
             <h3 class="text-base font-semibold text-white">{{ current_user.username }}</h3>
-            <p class="text-xs text-gray-400">Customer</p> <!-- Changed from "Premium User" -->
+            <p class="text-xs text-gray-400">Customer</p>
         </div>
     </div>
 
@@ -37,7 +37,7 @@
     <nav class="flex-1 overflow-y-auto p-5 space-y-4">
         <!-- Shopping Section -->
         <div>
-            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Shopping</h2> <!-- Changed from "Sales" -->
+            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Shopping</h2>
             <ul class="space-y-2 mt-3">
                 <li>
                     <a href="#" class="w-full flex items-center space-x-3 p-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 transition-all group" title="Browse Products" aria-label="Shop Now">
@@ -61,14 +61,14 @@
 
         <!-- Products Section -->
         <div>
-            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Products</h2> <!-- Changed from "Management" -->
+            <h2 class="text-gray-400 uppercase text-xs font-semibold tracking-widest">Products</h2>
             <ul class="space-y-2 mt-3">
                 <li>
                     <a href="#" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-700 transition-all group" title="Browse Products" aria-label="Products">
                         <div class="w-10 h-10 rounded-full bg-gray-700 group-hover:bg-amber-500/30 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-box-open text-base"></i> <!-- Changed icon -->
+                            <i class="fas fa-box-open text-base"></i>
                         </div>
-                        <span class="text-sm text-white">Browse Products</span> <!-- Changed from "Inventory" -->
+                        <span class="text-sm text-white">Browse Products</span>
                     </a>
                 </li>
                 {% if current_user.is_tenant() or current_user.is_admin() %}
@@ -129,14 +129,13 @@
                     <button class="text-sm text-amber-500 hover:text-amber-600" aria-label="Mark all as read">Clear All</button>
                 </div>
                 <div class="p-4 text-center text-gray-500 dark:text-gray-400">
-                    <p>No new updates</p> <!-- Dynamic content will go here -->
+                    <p>No new updates</p>
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="flex items-center space-x-2">
-            
             <button class="action-btn w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Refresh Products" aria-label="Refresh">
                 <i class="fas fa-sync-alt text-base"></i>
             </button>
@@ -155,7 +154,7 @@
                     <i class="fas fa-user mr-2"></i> My Account
                 </a>
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fas fa-question-circle mr-2"></i> Help <!-- Moved help here -->
+                    <i class="fas fa-question-circle mr-2"></i> Help
                 </a>
                 <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
@@ -163,20 +162,6 @@
             </div>
         </div>
     </div>
-    <script>
-        
-        document.getElementById('user-profile-dropdown').addEventListener('click', (e) => {
-    const dropdown = e.currentTarget.querySelector('.dropdown-menu');
-    dropdown.classList.toggle('hidden');
-});
-
-// Close dropdown when clicking elsewhere
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('#user-profile-dropdown')) {
-        document.querySelector('.dropdown-menu').classList.add('hidden');
-    }
-});
-    </script>
 </header>
 
         <!-- Main Content Area -->
@@ -242,7 +227,6 @@ document.addEventListener('click', (e) => {
             </button>
             <h3 class="text-lg font-semibold flex items-center gap-2">
                 <i class="fas fa-receipt"></i> cart
-                
             </h3>
         </div>
         <button id="clear-cart" class="text-amber-400 hover:text-amber-300 transition-colors text-sm flex items-center font-semibold" aria-label="Clear cart">
@@ -260,64 +244,86 @@ document.addEventListener('click', (e) => {
         </div>
     </div>
     <div class="border-t border-gray-200 dark:border-gray-700 px-3 py-3 bg-white dark:bg-gray-800 shrink-0">
-                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
-                                    <span>Subtotal:</span>
-                                    <span class="font-semibold" id="subtotal">Ksh 0.00</span>
-                                </div>
-                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
-                                    <span>Tax (0%):</span>
-                                    <span class="font-semibold" id="tax">Ksh 0.00</span>
-                                </div>
-                                <div class="flex justify-between text-gray-600 dark:text-gray-300">
-                                    <span>Discount:</span>
-                                    <span class="text-green-500 dark:text-green-400 font-semibold" id="discount">- Ksh 0.00</span>
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mb-2 text-base font-bold">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-700 dark:text-gray-200">Total:</span>
-                                    <span class="text-gray-900 dark:text-gray-100" id="total">Ksh 0.00</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Methods - Improved Design -->
-                            <div class="mb-4">
-    <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Payment Method</label>
-    <div class="grid grid-cols-2 gap-3" id="payment-methods">
-        <!-- Pay on Delivery -->
-        <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="pay_on_delivery" aria-label="Pay on Delivery">
-            <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 dark:text-amber-400 mb-2 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
-                <i class="fas fa-truck text-lg"></i>
-            </div>
-            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Pay on Delivery</span>
-            <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-amber-500 transition-colors"></div>
-        </button>
-
-        <!-- Mobile Payment -->
-       <button
-      class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group opacity-50 cursor-not-allowed"
-      data-method="mobile"
-      data-disabled="true"
-      aria-label="Pay with M-Pesa"
-    >
-      <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
-        <i class="fas fa-mobile-screen-button text-lg"></i>
-      </div>
-      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Mobile</span>
-      <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
-    </button>
-
+        <div class="flex justify-between text-gray-600 dark:text-gray-300">
+            <span>Subtotal:</span>
+            <span class="font-semibold" id="subtotal">Ksh 0.00</span>
+        </div>
+        <div class="flex justify-between text-gray-600 dark:text-gray-300">
+            <span>Tax (0%):</span>
+            <span class="font-semibold" id="tax">Ksh 0.00</span>
+        </div>
+        <div class="flex justify-between text-gray-600 dark:text-gray-300">
+            <span>Discount:</span>
+            <span class="text-green-500 dark:text-green-400 font-semibold" id="discount">- Ksh 0.00</span>
+        </div>
     </div>
-</div>
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mb-2 text-base font-bold">
+        <div class="flex justify-between">
+            <span class="text-gray-700 dark:text-gray-200">Total:</span>
+            <span class="text-gray-900 dark:text-gray-100" id="total">Ksh 0.00</span>
+        </div>
+    </div>
+    
+    <!-- Payment Mode Selection -->
+    <div class="mb-4">
+        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3">Payment Mode</label>
+        <div class="grid grid-cols-2 gap-3" id="payment-modes">
+            <!-- Pay Now -->
+            <button class="payment-mode flex flex-col items-center justify-center py-4 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_now" aria-label="Pay Now">
+                <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-3 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+                    <i class="fas fa-bolt text-xl"></i>
+                </div>
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Now</span>
+                <div class="mt-2 w-6 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
+            </button>
 
-                            
-                            <!-- Complete Sale Button - More Prominent -->
-                            <button id="complete-sale" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-full font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base group" aria-label="Complete Sale">
-                                <i class="fas fa-check-circle mr-3 transition-transform group-hover:scale-110"></i> 
-                                <span class="transition-transform group-hover:scale-105">Checkout</span>
-                            </button>
-                        </div>
-                    </div>
+            <!-- Pay Later -->
+            <button class="payment-mode flex flex-col items-center justify-center py-4 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_later" aria-label="Pay Later">
+                <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 dark:text-blue-400 mb-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Later</span>
+                <div class="mt-2 w-6 h-1 bg-transparent rounded-full group-hover:bg-blue-500 transition-colors"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Methods - Conditionally Shown -->
+    <div class="mb-4 hidden" id="payment-methods-container">
+        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Payment Method</label>
+        <div class="grid grid-cols-2 gap-3" id="payment-methods">
+            <!-- Cash Payment -->
+            <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="cash" aria-label="Cash Payment">
+                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+                    <i class="fas fa-money-bill-wave text-lg"></i>
+                </div>
+                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Cash</span>
+                <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
+            </button>
+
+            <!-- Mobile Payment -->
+            <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="mobile" aria-label="Mobile Payment">
+                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 dark:text-purple-400 mb-2 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
+                    <i class="fas fa-mobile-screen-button text-lg"></i>
+                </div>
+                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Mobile</span>
+                <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-purple-500 transition-colors"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Customer Name Input - For Pay Later -->
+    <div class="mb-4 hidden" id="customer-name-container">
+        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Customer Name *</label>
+        <input type="text" id="customer-name-input" placeholder="Enter customer name" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors">
+    </div>
+    
+    <!-- Complete Sale Button -->
+    <button id="complete-sale" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-full font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base group" aria-label="Complete Sale" disabled>
+        <i class="fas fa-check-circle mr-3 transition-transform group-hover:scale-110"></i> 
+        <span class="transition-transform group-hover:scale-105">Complete Sale</span>
+    </button>
+</div>
                 </div>
             </div>
 
@@ -359,7 +365,6 @@ document.addEventListener('click', (e) => {
             </div>
         </div>
 
-
    <div id="recent-transactions-modal" 
      class="fixed inset-0 z-50 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 sm:px-6 hidden">
   
@@ -369,7 +374,7 @@ document.addEventListener('click', (e) => {
     <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
       <div>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed view of last 5 transactions</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed view of last 4 transactions</p>
       </div>
       <button onclick="document.getElementById('recent-transactions-modal').classList.add('hidden')" 
               class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
@@ -384,19 +389,8 @@ document.addEventListener('click', (e) => {
          class="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white dark:bg-gray-800 thin-scrollbar">
       <!-- Transactions will be injected here -->
     </div>
-
-    <!-- Optional Footer (e.g., for actions) -->
-    <!--
-    <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-      <button class="btn">Close</button>
-    </div>
-    -->
   </div>
 </div>
-
-
-
-
 
         <!-- Global Loading Overlay -->
 <div id="global-loading-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -413,7 +407,7 @@ document.addEventListener('click', (e) => {
       Just a moment...
     </h3>
     <p id="loading-submessage" class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-      We’re getting things ready for you
+      We're getting things ready for you
     </p>
 
     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-4 overflow-hidden">
@@ -422,53 +416,6 @@ document.addEventListener('click', (e) => {
   </div>
 </div>
 
-
-
-
-<style>
-    
- .loader-cube .cube {
-  width: 12px;
-  height: 12px;
-  background-color: #f59e0b; /* amber-500 */
-  animation: cubeBounce 1s infinite ease-in-out;
-  border-radius: 3px;
-}
-.loader-cube .cube1 {
-  animation-delay: 0s;
-}
-.loader-cube .cube2 {
-  animation-delay: 0.2s;
-}
-.loader-cube .cube3 {
-  animation-delay: 0.4s;
-}
-
-@keyframes cubeBounce {
-  0%, 80%, 100% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-}
-
-@keyframes progress {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-progress {
-  animation: progress 2s linear infinite;
-}
-
-</style>
         <!-- Notification Container - Improved Design -->
         <div id="notification-container" class="fixed top-6 right-6 space-y-3 z-50 w-80"></div>
     </div>
@@ -554,6 +501,34 @@ document.addEventListener('click', (e) => {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .loader-cube .cube {
+          width: 12px;
+          height: 12px;
+          background-color: #f59e0b;
+          animation: cubeBounce 1s infinite ease-in-out;
+          border-radius: 3px;
+        }
+        .loader-cube .cube1 {
+          animation-delay: 0s;
+        }
+        .loader-cube .cube2 {
+          animation-delay: 0.2s;
+        }
+        .loader-cube .cube3 {
+          animation-delay: 0.4s;
+        }
+
+        @keyframes cubeBounce {
+          0%, 80%, 100% {
+            transform: scale(0.8);
+            opacity: 0.5;
+          }
+          40% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
     </style>
 
     <!-- JavaScript for Sidebar, Cart, and Fullscreen Toggle -->
@@ -611,6 +586,19 @@ document.addEventListener('click', (e) => {
                 sidebar.classList.add('-translate-x-full');
             }
         });
+
+        // User profile dropdown
+        document.getElementById('user-profile-dropdown').addEventListener('click', (e) => {
+            const dropdown = e.currentTarget.querySelector('.dropdown-menu');
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#user-profile-dropdown')) {
+                document.querySelector('.dropdown-menu').classList.add('hidden');
+            }
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -638,11 +626,15 @@ document.addEventListener('click', (e) => {
             completeSaleBtn: document.getElementById('complete-sale'),
             clearCartBtn: document.getElementById('clear-cart'),
             emptyCart: document.getElementById('empty-cart'),
-            paymentMethods: document.getElementById('payment-methods'),
             globalLoadingOverlay: document.getElementById('global-loading-overlay'),
             loadingMessage: document.getElementById('loading-message'),
             loadingSubmessage: document.getElementById('loading-submessage'),
-            cartItemCount: document.getElementById('cart-item-count')
+            cartItemCount: document.getElementById('cart-item-count'),
+            paymentModes: document.getElementById('payment-modes'),
+            paymentMethodsContainer: document.getElementById('payment-methods-container'),
+            paymentMethods: document.getElementById('payment-methods'),
+            customerNameContainer: document.getElementById('customer-name-container'),
+            customerNameInput: document.getElementById('customer-name-input')
         };
 
         // State Management
@@ -658,8 +650,10 @@ document.addEventListener('click', (e) => {
             isMobileView: window.innerWidth < 1024,
             lastAddedProductId: null,
             lastAddTime: 0,
+            selectedPaymentMode: null,
             selectedPaymentMethod: null,
-            activeProductId: null // Track which product has active quantity controls
+            customerName: '',
+            activeProductId: null
         };
 
         // Utility Functions
@@ -682,7 +676,6 @@ document.addEventListener('click', (e) => {
             elements.loadingSubmessage.textContent = submessage;
             elements.globalLoadingOverlay.classList.remove('hidden');
             
-            // Trigger animation after display
             setTimeout(() => {
                 document.getElementById('loading-modal-inner').classList.remove('scale-95', 'opacity-0');
                 document.getElementById('loading-modal-inner').classList.add('scale-100', 'opacity-100');
@@ -778,7 +771,7 @@ document.addEventListener('click', (e) => {
                
                 renderProducts();
                 renderCategories();
-                setupPaymentMethods();
+                setupPaymentFlow();
                 loadCartFromLocalStorage();
                 updateCartUI();
             } catch (error) {
@@ -946,8 +939,6 @@ document.addEventListener('click', (e) => {
     `;
 }).join('');
 
-
-
             fragment.appendChild(cardTemplate);
             grid.innerHTML = '';
             grid.appendChild(fragment);
@@ -1051,81 +1042,79 @@ document.addEventListener('click', (e) => {
             state.products = originalProducts;
         }
 
+        // Cart Operations
+        function addToCart(productId) {
+            const now = Date.now();
+            if (state.lastAddedProductId === productId && (now - state.lastAddTime) < 500) {
+                return false;
+            }
+            state.lastAddedProductId = productId;
+            state.lastAddTime = now;
 
-     // Cart Operations
-    function addToCart(productId) {
-    const now = Date.now();
-    if (state.lastAddedProductId === productId && (now - state.lastAddTime) < 500) {
-        return false;
-    }
-    state.lastAddedProductId = productId;
-    state.lastAddTime = now;
+            const product = state.products.find(p => p.id === productId);
+            if (!product) {
+                console.error(`Product ${productId} not found`);
+                return false;
+            }
 
-    const product = state.products.find(p => p.id === productId);
-    if (!product) {
-        console.error(`Product ${productId} not found`);
-        return false;
-    }
+            const minUnit = product.minimum_unit || 1;
+            const availableStock = product.stock - getCurrentCartQuantity(productId);
+            if (availableStock < minUnit) {
+                showNotification(`"${product.name}" is out of stock`, 'error');
+                return false;
+            }
 
-    const minUnit = product.minimum_unit || 1;
-    const availableStock = product.stock - getCurrentCartQuantity(productId);
-    if (availableStock < minUnit) {
-        showNotification(`"${product.name}" is out of stock`, 'error');
-        return false;
-    }
+            let existingItem = state.cart.find(item => item.product_id === productId);
+            let newQty = 0;
 
-    let existingItem = state.cart.find(item => item.product_id === productId);
-    let newQty = 0;
+            if (existingItem) {
+                const currentQty = existingItem.quantity;
 
-    if (existingItem) {
-        const currentQty = existingItem.quantity;
+                if (currentQty < 1) {
+                    newQty = +(currentQty + minUnit).toFixed(4);
+                } else {
+                    newQty = currentQty + 1;
+                }
 
-        if (currentQty < 1) {
-            newQty = +(currentQty + minUnit).toFixed(4);
-        } else {
-            newQty = currentQty + 1;
+                if (newQty > product.stock) {
+                    showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
+                    return false;
+                }
+
+                existingItem.quantity = newQty;
+            } else {
+                // First time add
+                const initialQty = Math.min(minUnit, product.stock);
+                state.cart.push({
+                    product_id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    discount: product.discount || 0,
+                    image_url: product.image_url,
+                    quantity: initialQty,
+                    is_combo: !!product.is_combo,
+                    combination_size: product.combination_size || 0,
+                    combination_price: product.combination_price || 0,
+                    stock: product.stock,
+                    unit: product.unit || '',
+                    minimum_unit: minUnit
+                });
+            }
+
+            const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
+            if (productCard) {
+                productCard.classList.add('animate-cart-add');
+                setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
+            }
+
+            if (!state.isMobileView && state.cart.length === 1) {
+                state.cartVisible = true;
+            }
+
+            updateCartUI();
+            showNotification(`${product.name} added`, 'success');
+            return true;
         }
-
-        if (newQty > product.stock) {
-            showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
-            return false;
-        }
-
-        existingItem.quantity = newQty;
-    } else {
-        // First time add
-        const initialQty = Math.min(minUnit, product.stock);
-        state.cart.push({
-            product_id: product.id,
-            name: product.name,
-            price: product.price,
-            discount: product.discount || 0,
-            image_url: product.image_url,
-            quantity: initialQty,
-            is_combo: !!product.is_combo,
-            combination_size: product.combination_size || 0,
-            combination_price: product.combination_price || 0,
-            stock: product.stock,
-            unit: product.unit || '',
-            minimum_unit: minUnit
-        });
-    }
-
-    const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
-    if (productCard) {
-        productCard.classList.add('animate-cart-add');
-        setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
-    }
-
-    if (!state.isMobileView && state.cart.length === 1) {
-        state.cartVisible = true;
-    }
-
-    updateCartUI();
-    showNotification(`${product.name} added`, 'success');
-    return true;
-}
-
 
         function removeFromCart(productId) {
             const index = state.cart.findIndex(item => item.product_id === productId);
@@ -1138,81 +1127,74 @@ document.addEventListener('click', (e) => {
             showNotification(`Removed ${removed.name} from cart`, 'info');
         }
 
-  function updateCartItemQuantity(productId, change) {
-    const cartItem = state.cart.find(item => item.product_id === productId);
-    if (!cartItem) return;
+        function updateCartItemQuantity(productId, change) {
+            const cartItem = state.cart.find(item => item.product_id === productId);
+            if (!cartItem) return;
 
-    const minUnit = cartItem.minimum_unit || 1;
-    const currentQty = cartItem.quantity;
-    let newQty = currentQty;
+            const minUnit = cartItem.minimum_unit || 1;
+            const currentQty = cartItem.quantity;
+            let newQty = currentQty;
 
-    if (change > 0) {
-        // INCREASE
-        if (currentQty < 1) {
-            newQty = +(currentQty + minUnit).toFixed(4);
-        } else {
-            newQty = currentQty + 1;
+            if (change > 0) {
+                // INCREASE
+                if (currentQty < 1) {
+                    newQty = +(currentQty + minUnit).toFixed(4);
+                } else {
+                    newQty = currentQty + 1;
+                }
+            } else {
+                // DECREASE
+                if (currentQty > 1) {
+                    newQty = currentQty - 1;
+                } else if (currentQty > minUnit) {
+                    newQty = +(currentQty - minUnit).toFixed(4);
+                } else if (currentQty <= minUnit) {
+                    // Remove item if it reaches minimum unit
+                    removeFromCart(productId);
+                    return;
+                }
+            }
+
+            // Ensure stock isn't exceeded
+            const product = state.products.find(p => p.id === productId);
+            if (newQty > product.stock) {
+                showNotification(`Only ${product.stock} available for "${cartItem.name}"`, 'error');
+                return;
+            }
+
+            cartItem.quantity = newQty;
+            updateCartUI();
         }
-    } else {
-        // DECREASE
-        if (currentQty > 1) {
-            newQty = currentQty - 1;
-        } else if (currentQty > minUnit) {
-            newQty = +(currentQty - minUnit).toFixed(4);
-        } else if (currentQty <= minUnit) {
-            // Remove item if it reaches minimum unit
-            removeFromCart(productId);
-            return;
-        }
-    }
-
-    // Ensure stock isn't exceeded
-    const product = state.products.find(p => p.id === productId);
-    if (newQty > product.stock) {
-        showNotification(`Only ${product.stock} available for "${cartItem.name}"`, 'error');
-        return;
-    }
-
-    cartItem.quantity = newQty;
-    updateCartUI();
-}
-
 
         function getCurrentCartQuantity(productId) {
             const item = state.cart.find(i => i.product_id === productId);
             return item ? item.quantity : 0;
         }
 
+        function roundUpToNearestFive(amount) {
+            return Math.ceil(amount / 5) * 5;
+        }
 
-function roundUpToNearestFive(amount) {
-    return Math.ceil(amount / 5) * 5;
-}
+        function calculateItemSubtotal(item) {
+            let rawSubtotal;
 
+            if (item.is_combo && item.combination_size > 1) {
+                const comboUnits = Math.floor(item.quantity / item.combination_size);
+                const remainder = item.quantity % item.combination_size;
+                const comboPrice = comboUnits * item.combination_price;
+                const remainderPrice = remainder * item.price;
+                rawSubtotal = comboPrice + Math.min(remainderPrice, item.combination_price);
+            } else {
+                rawSubtotal = item.quantity * item.price;
+            }
 
-    function calculateItemSubtotal(item) {
-    let rawSubtotal;
-
-    if (item.is_combo && item.combination_size > 1) {
-        const comboUnits = Math.floor(item.quantity / item.combination_size);
-        const remainder = item.quantity % item.combination_size;
-        const comboPrice = comboUnits * item.combination_price;
-        const remainderPrice = remainder * item.price;
-        rawSubtotal = comboPrice + Math.min(remainderPrice, item.combination_price);
-    } else {
-        rawSubtotal = item.quantity * item.price;
-    }
-
-    return roundUpToNearestFive(rawSubtotal);
-}
-
+            return roundUpToNearestFive(rawSubtotal);
+        }
 
         function calculateItemDiscount(item) {
             if (!item.discount || item.discount <= 0) return 0;
             return (item.price * item.quantity) * (item.discount / 100);
         }
-
-
-
 
         function calculateCartTotals() {
             let subtotal = 0;
@@ -1304,7 +1286,6 @@ function roundUpToNearestFive(amount) {
             elements.subtotalEl.textContent = formatCurrency(totals.subtotal);
             elements.taxEl.textContent = formatCurrency(totals.tax);
             elements.totalEl.textContent = formatCurrency(totals.total);
-            elements.completeSaleBtn.disabled = state.cart.length === 0;
             
             // Update cart item count
             const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -1331,7 +1312,7 @@ function roundUpToNearestFive(amount) {
             });
             
             saveCartToLocalStorage();
-            document.dispatchEvent(new Event('cartUpdated'));
+            validateCompleteSaleButton();
         }
 
         function showCart() {
@@ -1409,570 +1390,854 @@ function roundUpToNearestFive(amount) {
             showNotification('Cart cleared', 'success');
         }
 
-        async function completeSale() {
-            if (!state.cart || state.cart.length === 0) {
-                showNotification('Cart is empty', 'error');
-                return;
+        // Setup Payment Flow
+        function setupPaymentFlow() {
+            // Initialize elements safely
+            initializePaymentElements();
+            
+            if (elements.paymentModes) {
+                setupPaymentModes();
             }
-            if (!state.selectedPaymentMethod) {
-                showNotification('Please select a payment method', 'error');
-                return;
+            if (elements.paymentMethods) {
+                setupPaymentMethods();
             }
-            try {
-                showLoading('Completeing Checkout ...');
-                const payload = {
-                    payment_method: state.selectedPaymentMethod,
-                    cart_items: state.cart.map(item => ({
-                        product_id: item.product_id,
-                        quantity: item.quantity
-                    }))
-                };
-                const res = await axios.post(`${API_BASE_URL}/transactions`, payload, {
-                    timeout: 10000
-                });
-                if (!res.data?.success) {
-                    throw new Error('Unexpected server response');
-                }
-                state.cart = [];
-                state.cartVisible = false;
-                updateCartUI();
-                showNotification('Sale completed successfully!', 'success');
-            } catch (error) {
-                handleError('Sale failed', error);
-            } finally {
-                hideLoading();
+            if (elements.customerNameInput) {
+                setupCustomerNameInput();
+            }
+            if (elements.completeSaleBtn) {
+                setupCompleteSaleButton();
             }
         }
 
+        function initializePaymentElements() {
+            // Ensure all payment elements are properly initialized
+            Object.assign(elements, {
+                paymentModes: document.getElementById('payment-modes'),
+                paymentMethodsContainer: document.getElementById('payment-methods-container'),
+                paymentMethods: document.getElementById('payment-methods'),
+                customerNameContainer: document.getElementById('customer-name-container'),
+                customerNameInput: document.getElementById('customer-name-input'),
+                completeSaleBtn: document.getElementById('complete-sale')
+            });
+        }
+
+        function setupPaymentModes() {
+            if (!elements.paymentModes) {
+                console.warn('Payment modes element not found');
+                return;
+            }
+            
+            elements.paymentModes.addEventListener('click', (e) => {
+                const button = e.target.closest('.payment-mode');
+                if (!button) return;
+                
+                const mode = button.dataset.mode;
+                
+                // Reset UI for all modes
+                document.querySelectorAll('.payment-mode').forEach(btn => {
+                    const iconDiv = btn.querySelector('div:first-child');
+                    const indicator = btn.querySelector('div:last-child');
+                    
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove(
+                            'bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400',
+                            'bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-500', 'dark:text-blue-400'
+                        );
+                        iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        indicator.classList.remove('bg-green-500', 'bg-blue-500');
+                        indicator.classList.add('bg-transparent');
+                    }
+                });
+
+                // Highlight selected mode
+                const iconDiv = button.querySelector('div:first-child');
+                const indicator = button.querySelector('div:last-child');
+                
+                if (mode === 'pay_now') {
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        iconDiv.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400');
+                        indicator.classList.remove('bg-transparent');
+                        indicator.classList.add('bg-green-500');
+                    }
+                    
+                    // Show payment methods, hide customer name
+                    if (elements.paymentMethodsContainer) {
+                        elements.paymentMethodsContainer.classList.remove('hidden');
+                    }
+                    if (elements.customerNameContainer) {
+                        elements.customerNameContainer.classList.add('hidden');
+                    }
+                    
+                } else if (mode === 'pay_later') {
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        iconDiv.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-500', 'dark:text-blue-400');
+                        indicator.classList.remove('bg-transparent');
+                        indicator.classList.add('bg-blue-500');
+                    }
+                    
+                    // Hide payment methods, show customer name
+                    if (elements.paymentMethodsContainer) {
+                        elements.paymentMethodsContainer.classList.add('hidden');
+                    }
+                    if (elements.customerNameContainer) {
+                        elements.customerNameContainer.classList.remove('hidden');
+                    }
+                    
+                    // Auto-set payment method for pay_later
+                    state.selectedPaymentMethod = 'pay_on_delivery';
+                }
+                
+                state.selectedPaymentMode = mode;
+                state.selectedPaymentMethod = null; // Reset payment method when mode changes
+                
+                // Reset payment method UI
+                document.querySelectorAll('.payment-method').forEach(btn => {
+                    const iconDiv = btn.querySelector('div:first-child');
+                    const indicator = btn.querySelector('div:last-child');
+                    
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove(
+                            'bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400',
+                            'bg-purple-100', 'dark:bg-purple-900/30', 'text-purple-500', 'dark:text-purple-400'
+                        );
+                        iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        indicator.classList.remove('bg-green-500', 'bg-purple-500');
+                        indicator.classList.add('bg-transparent');
+                    }
+                });
+                
+                validateCompleteSaleButton();
+            });
+        }
+
+        function setupPaymentMethods() {
+            if (!elements.paymentMethods) {
+                console.warn('Payment methods element not found');
+                return;
+            }
+            
+            elements.paymentMethods.addEventListener('click', (e) => {
+                const button = e.target.closest('.payment-method');
+                if (!button) return;
+                
+                const method = button.dataset.method;
+                
+                // Reset UI for all methods
+                document.querySelectorAll('.payment-method').forEach(btn => {
+                    const iconDiv = btn.querySelector('div:first-child');
+                    const indicator = btn.querySelector('div:last-child');
+                    
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove(
+                            'bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400',
+                            'bg-purple-100', 'dark:bg-purple-900/30', 'text-purple-500', 'dark:text-purple-400'
+                        );
+                        iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        indicator.classList.remove('bg-green-500', 'bg-purple-500');
+                        indicator.classList.add('bg-transparent');
+                    }
+                });
+
+                // Highlight selected method
+                const iconDiv = button.querySelector('div:first-child');
+                const indicator = button.querySelector('div:last-child');
+                
+                if (method === 'cash') {
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        iconDiv.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400');
+                        indicator.classList.remove('bg-transparent');
+                        indicator.classList.add('bg-green-500');
+                    }
+                } else if (method === 'mobile') {
+                    if (iconDiv && indicator) {
+                        iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                        iconDiv.classList.add('bg-purple-100', 'dark:bg-purple-900/30', 'text-purple-500', 'dark:text-purple-400');
+                        indicator.classList.remove('bg-transparent');
+                        indicator.classList.add('bg-purple-500');
+                    }
+                }
+                
+                state.selectedPaymentMethod = method;
+                validateCompleteSaleButton();
+            });
+        }
+
+        function setupCustomerNameInput() {
+            if (!elements.customerNameInput) {
+                console.warn('Customer name input element not found');
+                return;
+            }
+            
+            elements.customerNameInput.addEventListener('input', (e) => {
+                state.customerName = e.target.value.trim();
+                validateCompleteSaleButton();
+            });
+        }
+
+        function setupCompleteSaleButton() {
+            if (!elements.completeSaleBtn) {
+                console.warn('Complete sale button element not found');
+                return;
+            }
+            
+            elements.completeSaleBtn.addEventListener('click', openConfirmSaleModal);
+        }
+
+        function validateCompleteSaleButton() {
+            if (!elements.completeSaleBtn) return;
+            
+            const hasCartItems = state.cart && state.cart.length > 0;
+            const hasValidPaymentMode = state.selectedPaymentMode !== null;
+            
+            let isValid = hasCartItems && hasValidPaymentMode;
+            
+            if (hasValidPaymentMode) {
+                if (state.selectedPaymentMode === 'pay_now') {
+                    isValid = isValid && state.selectedPaymentMethod !== null;
+                } else if (state.selectedPaymentMode === 'pay_later') {
+                    isValid = isValid && state.customerName.trim().length > 0;
+                }
+            }
+            
+            elements.completeSaleBtn.disabled = !isValid;
+        }
+
+        // Update the completeSale function
+        // Update the completeSale function to match SaleItemSchema
+async function completeSale() {
+    if (!state.cart || state.cart.length === 0) {
+        showNotification('Cart is empty', 'error');
+        return;
+    }
+    if (!state.selectedPaymentMode) {
+        showNotification('Please select a payment mode', 'error');
+        return;
+    }
+    
+    try {
+        showLoading('Completing Checkout...');
+        
+        // Detailed debug logging
+        console.log('=== DEBUG: Cart Items ===');
+        state.cart.forEach((item, index) => {
+            console.log(`Item ${index}:`, {
+                product_id: item.product_id,
+                quantity: item.quantity,
+                price: item.price,
+                price_type: typeof item.price,
+                price_value: item.price,
+                has_price: item.hasOwnProperty('price')
+            });
+        });
+        
+        // Build payload with extra validation
+        const payload = {
+            payment_mode: state.selectedPaymentMode,
+            payment_method: state.selectedPaymentMethod,
+            cart_items: state.cart.map(item => {
+                // Validate each item before sending
+                if (typeof item.price === 'undefined' || item.price === null) {
+                    throw new Error(`Price is missing for product ${item.product_id}`);
+                }
+                if (isNaN(parseFloat(item.price))) {
+                    throw new Error(`Price is not a number for product ${item.product_id}: ${item.price}`);
+                }
+                
+                return {
+                    product_id: item.product_id,
+                    quantity: parseFloat(item.quantity),
+                    price: parseFloat(item.price)
+                };
+            })
+        };
+        
+        // Add customer data for pay_later
+        if (state.selectedPaymentMode === 'pay_later') {
+            payload.customer_name = state.customerName;
+            payload.customer_phone = '';
+        }
+        
+        console.log('=== DEBUG: Final Payload ===', JSON.stringify(payload, null, 2));
+        
+        const res = await axios.post(`${API_BASE_URL}/transactions`, payload, {
+            timeout: 10000
+        });
+        
+        if (!res.data?.success) {
+            throw new Error('Unexpected server response');
+        }
+        
+        // Reset state and UI
+        state.cart = [];
+        state.cartVisible = false;
+        state.selectedPaymentMode = null;
+        state.selectedPaymentMethod = null;
+        state.customerName = '';
+        
+        if (elements.paymentMethodsContainer) {
+            elements.paymentMethodsContainer.classList.add('hidden');
+        }
+        if (elements.customerNameContainer) {
+            elements.customerNameContainer.classList.add('hidden');
+        }
+        if (elements.customerNameInput) {
+            elements.customerNameInput.value = '';
+        }
+        resetPaymentUI();
+        
+        updateCartUI();
+        showNotification('Sale completed successfully!', 'success');
+        
+    } catch (error) {
+        console.error('=== DEBUG: Full Error Details ===', error);
+        console.error('=== DEBUG: Error Response ===', error.response?.data);
+        
+        if (error.response?.data?.error) {
+            const errorData = error.response.data.error;
+            console.error('=== DEBUG: Backend Error ===', errorData);
+            
+            let errorMessage = 'Checkout failed: ';
+            if (typeof errorData === 'string') {
+                errorMessage += errorData;
+            } else if (errorData.cart_items) {
+                Object.values(errorData.cart_items).forEach((itemErrors, index) => {
+                    console.error(`=== DEBUG: Item ${index} Errors ===`, itemErrors);
+                    if (itemErrors.quantity) errorMessage += `Quantity error: ${itemErrors.quantity[0]}. `;
+                    if (itemErrors.price) errorMessage += `Price error: ${itemErrors.price[0]}. `;
+                });
+            } else {
+                errorMessage += JSON.stringify(errorData);
+            }
+            
+            showNotification(errorMessage, 'error');
+        } else {
+            handleError('Sale failed', error);
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+        function resetPaymentUI() {
+            // Reset payment modes
+            document.querySelectorAll('.payment-mode').forEach(btn => {
+                const iconDiv = btn.querySelector('div:first-child');
+                const indicator = btn.querySelector('div:last-child');
+                
+                if (iconDiv && indicator) {
+                    iconDiv.classList.remove(
+                        'bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400',
+                        'bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-500', 'dark:text-blue-400'
+                    );
+                    iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                    indicator.classList.remove('bg-green-500', 'bg-blue-500');
+                    indicator.classList.add('bg-transparent');
+                }
+            });
+            
+            // Reset payment methods
+            document.querySelectorAll('.payment-method').forEach(btn => {
+                const iconDiv = btn.querySelector('div:first-child');
+                const indicator = btn.querySelector('div:last-child');
+                
+                if (iconDiv && indicator) {
+                    iconDiv.classList.remove(
+                        'bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400',
+                        'bg-purple-100', 'dark:bg-purple-900/30', 'text-purple-500', 'dark:text-purple-400'
+                    );
+                    iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
+                    indicator.classList.remove('bg-green-500', 'bg-purple-500');
+                    indicator.classList.add('bg-transparent');
+                }
+            });
+            
+            validateCompleteSaleButton();
+        }
+
+        // Update the openConfirmSaleModal function to include payment mode
         function openConfirmSaleModal() {
             if (!state.cart || state.cart.length === 0) {
                 showNotification('Cart is empty. Cannot proceed.', 'warning');
                 return;
             }
+            
             const totals = calculateCartTotals();
             const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-            const paymentMethod = state.selectedPaymentMethod ? state.selectedPaymentMethod.charAt(0).toUpperCase() + state.selectedPaymentMethod.slice(1) : '—';
+            
+            const paymentMode = state.selectedPaymentMode ? 
+                state.selectedPaymentMode.charAt(0).toUpperCase() + state.selectedPaymentMode.slice(1).replace('_', ' ') : '—';
+            
+            const paymentMethod = state.selectedPaymentMethod ? 
+                state.selectedPaymentMethod.charAt(0).toUpperCase() + state.selectedPaymentMethod.slice(1).replace('_', ' ') : '—';
+            
+            let customerInfo = '';
+            if (state.selectedPaymentMode === 'pay_later' && state.customerName) {
+                customerInfo = `
+                    <div class="flex justify-between">
+                        <span class="font-medium">Customer:</span>
+                        <span class="text-blue-600 dark:text-blue-400">${state.customerName}</span>
+                    </div>
+                `;
+            }
+            
             const summaryHTML = `
                 <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
                     <div class="flex justify-between">
-                        <span class="font-medium">Items:</span>
-                        <span>${itemCount}</span>
+                        <span class="font-medium">Payment Mode:</span>
+                        <span class="${state.selectedPaymentMode === 'pay_now' ? 'text-green-600' : 'text-blue-600'} dark:${state.selectedPaymentMode === 'pay_now' ? 'text-green-400' : 'text-blue-400'} font-semibold">${paymentMode}</span>
                     </div>
+                    ${customerInfo}
                     <div class="flex justify-between">
-                        <span class="font-medium">Subtotal:</span>
-                        <span>${formatCurrency(totals.subtotal)}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium">Tax (${(state.taxRate * 100)}%):</span>
-                        <span>${formatCurrency(totals.tax)}</span>
-                    </div>
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                        <div class="flex justify-between font-semibold">
-                            <span>Total:</span>
-                            <span class="text-lg text-green-700 dark:text-green-300">${formatCurrency(totals.total)}</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between mt-3">
                         <span class="font-medium">Payment Method:</span>
                         <span class="text-amber-600 dark:text-amber-400">${paymentMethod}</span>
                     </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
+                        <div class="flex justify-between">
+                            <span class="font-medium">Items:</span>
+                            <span>${itemCount}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium">Subtotal:</span>
+                            <span>${formatCurrency(totals.subtotal)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium">Tax (${(state.taxRate * 100)}%):</span>
+                            <span>${formatCurrency(totals.tax)}</span>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                            <div class="flex justify-between font-semibold">
+                                <span>Total:</span>
+                                <span class="text-lg text-green-700 dark:text-green-300">${formatCurrency(totals.total)}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
+            
             document.getElementById('confirm-sale-summary').innerHTML = summaryHTML;
             showModal('confirm-sale-modal');
         }
 
-        function setupPaymentMethods() {
-    elements.paymentMethods.addEventListener('click', (e) => {
-        const button = e.target.closest('.payment-method');
-        if (!button) return;
-        
-        // Reset UI for all
-        document.querySelectorAll('.payment-method').forEach(btn => {
-            const iconDiv = btn.querySelector('div:first-child');
-            const indicator = btn.querySelector('div:last-child');
-
-            iconDiv.classList.remove(
-                'bg-amber-100', 'dark:bg-amber-900/30',
-                'bg-green-100', 'dark:bg-green-900/30',
-                'text-amber-500', 'dark:text-amber-400',
-                'text-green-500', 'dark:text-green-400',
-                'bg-gray-100', 'dark:bg-gray-700',
-                'text-gray-500', 'dark:text-gray-400'
-            );
-            iconDiv.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
-            indicator.classList.remove('bg-amber-500', 'bg-green-500');
-            indicator.classList.add('bg-transparent');
-        });
-
-        // Highlight selected
-        const method = button.dataset.method;
-        const iconDiv = button.querySelector('div:first-child');
-        const indicator = button.querySelector('div:last-child');
-
-        if (method === 'pay_on_delivery') {
-            iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
-            iconDiv.classList.add('bg-amber-100', 'dark:bg-amber-900/30', 'text-amber-500', 'dark:text-amber-400');
-            indicator.classList.remove('bg-transparent');
-            indicator.classList.add('bg-amber-500');
-        } else if (method === 'mobile') {
-            iconDiv.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-500', 'dark:text-gray-400');
-            iconDiv.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-500', 'dark:text-green-400');
-            indicator.classList.remove('bg-transparent');
-            indicator.classList.add('bg-green-500');
-        }
-
-        state.selectedPaymentMethod = method;
-    });
-}
-
-
-
-
-
-
-//  Recent Transactions Modal 
-async function loadRecentTransactionsModal() {
-    const container = document.getElementById('recent-transactions-body');
-    
-    // Show elegant loading state
-    container.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Loading recent orders...</p>
-        </div>
-    `;
-
-    try {
-        const res = await axios.get(`${API_BASE_URL}/transactions/recent`);
-        
-        if (!res.data || !Array.isArray(res.data)) {
-            throw new Error('Invalid response format');
-        }
-
-        const transactions = res.data;
-
-        if (transactions.length === 0) {
+        // Recent Transactions Modal 
+        async function loadRecentTransactionsModal() {
+            const container = document.getElementById('recent-transactions-body');
+            
+            // Show elegant loading state
             container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-history text-2xl text-gray-400 dark:text-gray-500"></i>
-                    </div>
-                    <h4 class="font-medium text-gray-600 dark:text-gray-300 mb-1">No recent transactions</h4>
-                    <p class="text-gray-400 dark:text-gray-500 text-sm">Your recent orders will appear here</p>
+                <div class="flex flex-col items-center justify-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Loading recent orders...</p>
                 </div>
             `;
-            return;
-        }
 
-        // Render transaction cards
-        container.innerHTML = `
-            <div class="space-y-4">
-                ${transactions.map(tx => `
-                    <div class="transaction-card group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xs hover:shadow-md transition-all cursor-pointer"
-                         data-id="${tx.id}"
-                         onclick="loadTransactionDetails('${tx.id}', this)">
-                        <div class="p-5 flex justify-between items-start">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">
-                                        Order #${tx.id}
-                                    </h3>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColorClass(tx.status)}">
-                                        ${tx.status}
-                                    </span>
-                                </div>
-                                
-                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                                    <span class="flex items-center">
-                                        <i class="far fa-calendar mr-1.5"></i>
-                                        ${new Date(tx.date).toLocaleDateString()}
-                                    </span>
-                                    <span class="flex items-center">
-                                        <i class="far fa-clock mr-1.5"></i>
-                                        ${new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                    </span>
-                                    <span class="flex items-center">
-                                        <i class="far fa-user mr-1.5"></i>
-                                        ${tx.customer_name || 'Walk-in'}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div class="text-right ml-4 flex-shrink-0">
-                                <p class="text-xl font-bold text-amber-600 dark:text-amber-400">
-                                    ${formatCurrency(tx.total)}
-                                </p>
-                                <div class="mt-2 flex justify-end">
-                                    <button class="reorder-btn inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900 transition-all"
-                                            onclick="event.stopPropagation(); reorderTransaction('${tx.id}')">
-                                        <i class="fas fa-redo-alt mr-1.5 text-xs"></i>
-                                        Reorder
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="transaction-details hidden px-5 pb-5"></div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-
-    } catch (err) {
-        console.error('Transaction load error:', err);
-        container.innerHTML = `
-            <div class="text-center py-12">
-                <div class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4 text-red-500 dark:text-red-400">
-                    <i class="fas fa-exclamation-triangle text-2xl"></i>
-                </div>
-                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Failed to load transactions</h4>
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">We couldn't load your recent orders</p>
-                <button onclick="loadRecentTransactionsModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
-                    <i class="fas fa-sync-alt mr-2"></i>
-                    Try Again
-                </button>
-            </div>
-        `;
-    }
-}
-
-function hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('hidden');
-    } else {
-        console.warn(`Modal with ID "${modalId}" not found.`);
-    }
-}
-
-
-
-// Load detailed transaction information when clicked
-async function loadTransactionDetails(txId, cardElement) {
-    const detailsEl = cardElement.querySelector('.transaction-details');
-    
-    // If already loaded, just toggle visibility
-    if (detailsEl.innerHTML) {
-        detailsEl.classList.toggle('hidden');
-        cardElement.classList.toggle('border-amber-400');
-        return;
-    }
-    
-    // Show loading state
-    detailsEl.innerHTML = `
-        <div class="flex justify-center py-6">
-            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
-        </div>
-    `;
-    detailsEl.classList.remove('hidden');
-    cardElement.classList.add('border-amber-400');
-    
-    try {
-        const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
-        const tx = res.data;
-        
-        // Calculate price differences for display
-        const itemsWithPriceDiff = tx.items.map(item => {
-            const product = state.products.find(p => p.id === item.product_id);
-            const currentPrice = product ? product.selling_price : item.price;
-            return {
-                ...item,
-                price_diff: currentPrice - item.price,
-                current_price: currentPrice
-            };
-        });
-        
-        detailsEl.innerHTML = `
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-5 mt-2">
-               
+            try {
+                const res = await axios.get(`${API_BASE_URL}/transactions/recent`);
                 
-                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                    <i class="fas fa-boxes text-amber-500 mr-2"></i>
-                    Sale Items (${tx.items.length})
-                </h4>
-                
-                <div class="space-y-3 max-h-96 overflow-y-auto thin-scrollbar pr-2">
-                    ${itemsWithPriceDiff.map(item => `
-                        <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 hover:shadow-sm transition-shadow">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 h-16 w-16 bg-gray-100 dark:bg-gray-600 rounded-md overflow-hidden mr-4">
-                                    ${item.image_url ? `
-                                        <img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">
-                                    ` : `
-                                        <div class="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-300">
-                                            <i class="fas fa-box-open text-xl"></i>
-                                        </div>
-                                    `}
-                                </div>
-                                
-                                <div class="flex-1 min-w-0">
-                                    <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">${item.name}</h5>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        ${item.quantity} 
-                                        ${item.discount > 0 ? `
-                                            <span class="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
-                                                ${item.discount}% off
-                                            </span>
-                                        ` : ''}
-                                    </p>
-                                    
-                                   
-                                </div>
-                                
-                                <div class="ml-4 text-right">
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                                        ${formatCurrency(item.unit_price * item.quantity)}
-                                    </p>
-                                    ${item.discount > 0 ? `
-                                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
-                                            Saved ${formatCurrency((item.price * item.quantity) * (item.discount/100))}
-                                        </p>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    } catch (error) {
-        detailsEl.innerHTML = `
-            <div class="text-center py-6">
-                <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-3 text-red-500 dark:text-red-400">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Failed to load Sale details</h4>
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">${error.response?.data?.error || 'Please try again'}</p>
-                <button onclick="loadTransactionDetails('${txId}', this.closest('.transaction-card'))" 
-                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
-                    <i class="fas fa-sync-alt mr-1.5"></i>
-                    Retry
-                </button>
-            </div>
-        `;
-    } finally {
-        cardElement.classList.remove('border-amber-400');
-    }
-}
-
-//  reorder functionality with current prices
-async function reorderTransaction(txId) {
-    try {
-        showLoading('Preparing reorder...', 'Getting your Sale ready');
-        
-        const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
-        const tx = res.data;
-        
-        state.cart = []; // Clear current cart
-        
-        let addedCount = 0;
-        for (const item of tx.items) {
-            const product = state.products.find(p => p.id === item.product_id);
-            if (product) {
-                const success = reorderItem(product.id, item.quantity);
-                if (success) {
-                    addedCount++;
-                } else {
-                    showNotification(`"${product.name}" is out of stock`, 'warning');
+                if (!res.data || !Array.isArray(res.data)) {
+                    throw new Error('Invalid response format');
                 }
+
+                const transactions = res.data;
+
+                if (transactions.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <div class="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-history text-2xl text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <h4 class="font-medium text-gray-600 dark:text-gray-300 mb-1">No recent transactions</h4>
+                            <p class="text-gray-400 dark:text-gray-500 text-sm">Your recent orders will appear here</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render transaction cards
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        ${transactions.map(tx => `
+                            <div class="transaction-card group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                                 data-id="${tx.id}"
+                                 onclick="loadTransactionDetails('${tx.id}', this)">
+                                <div class="p-5 flex justify-between items-start">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">
+                                                Order #${tx.id}
+                                            </h3>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColorClass(tx.status)}">
+                                                ${tx.status}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="flex items-center">
+                                                <i class="far fa-calendar mr-1.5"></i>
+                                                ${new Date(tx.date).toLocaleDateString()}
+                                            </span>
+                                            <span class="flex items-center">
+                                                <i class="far fa-clock mr-1.5"></i>
+                                                ${new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                            </span>
+                                            <span class="flex items-center">
+                                                <i class="far fa-user mr-1.5"></i>
+                                                ${tx.customer_name || 'Walk-in'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-right ml-4 flex-shrink-0">
+                                        <p class="text-xl font-bold text-amber-600 dark:text-amber-400">
+                                            ${formatCurrency(tx.total)}
+                                        </p>
+                                        <div class="mt-2 flex justify-end">
+                                            <button class="reorder-btn inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900 transition-all"
+                                                    onclick="event.stopPropagation(); reorderTransaction('${tx.id}')">
+                                                <i class="fas fa-redo-alt mr-1.5 text-xs"></i>
+                                                Reorder
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="transaction-details hidden px-5 pb-5"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+            } catch (err) {
+                console.error('Transaction load error:', err);
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4 text-red-500 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-2xl"></i>
+                        </div>
+                        <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Failed to load transactions</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">We couldn't load your recent orders</p>
+                        <button onclick="loadRecentTransactionsModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Try Again
+                        </button>
+                    </div>
+                `;
             }
         }
 
-        hideLoading();
+        // Load detailed transaction information when clicked
+        async function loadTransactionDetails(txId, cardElement) {
+            const detailsEl = cardElement.querySelector('.transaction-details');
+            
+            // If already loaded, just toggle visibility
+            if (detailsEl.innerHTML) {
+                detailsEl.classList.toggle('hidden');
+                cardElement.classList.toggle('border-amber-400');
+                return;
+            }
+            
+            // Show loading state
+            detailsEl.innerHTML = `
+                <div class="flex justify-center py-6">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
+                </div>
+            `;
+            detailsEl.classList.remove('hidden');
+            cardElement.classList.add('border-amber-400');
+            
+            try {
+                const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
+                const tx = res.data;
+                
+                // Calculate price differences for display
+                const itemsWithPriceDiff = tx.items.map(item => {
+                    const product = state.products.find(p => p.id === item.product_id);
+                    const currentPrice = product ? product.selling_price : item.price;
+                    return {
+                        ...item,
+                        price_diff: currentPrice - item.price,
+                        current_price: currentPrice
+                    };
+                });
+                
+                detailsEl.innerHTML = `
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-5 mt-2">
+                       
+                        
+                        <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-boxes text-amber-500 mr-2"></i>
+                            Sale Items (${tx.items.length})
+                        </h4>
+                        
+                        <div class="space-y-3 max-h-96 overflow-y-auto thin-scrollbar pr-2">
+                            ${itemsWithPriceDiff.map(item => `
+                                <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 hover:shadow-sm transition-shadow">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 h-16 w-16 bg-gray-100 dark:bg-gray-600 rounded-md overflow-hidden mr-4">
+                                            ${item.image_url ? `
+                                                <img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">
+                                            ` : `
+                                                <div class="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-300">
+                                                    <i class="fas fa-box-open text-xl"></i>
+                                                </div>
+                                            `}
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">${item.name}</h5>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                ${item.quantity} 
+                                                ${item.discount > 0 ? `
+                                                    <span class="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+                                                        ${item.discount}% off
+                                                    </span>
+                                                ` : ''}
+                                            </p>
+                                            
+                                           
+                                        </div>
+                                        
+                                        <div class="ml-4 text-right">
+                                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                                                ${formatCurrency(item.unit_price * item.quantity)}
+                                            </p>
+                                            ${item.discount > 0 ? `
+                                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                                    Saved ${formatCurrency((item.price * item.quantity) * (item.discount/100))}
+                                                </p>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                detailsEl.innerHTML = `
+                    <div class="text-center py-6">
+                        <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-3 text-red-500 dark:text-red-400">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Failed to load Sale details</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">${error.response?.data?.error || 'Please try again'}</p>
+                        <button onclick="loadTransactionDetails('${txId}', this.closest('.transaction-card'))" 
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900">
+                            <i class="fas fa-sync-alt mr-1.5"></i>
+                            Retry
+                        </button>
+                    </div>
+                `;
+            } finally {
+                cardElement.classList.remove('border-amber-400');
+            }
+        }
 
-        const modal = document.getElementById('recent-transactions-modal');
-        if (modal) modal.classList.add('hidden');
-        
-        if (addedCount > 0) {
-            showNotification(`Added ${addedCount} items to cart from Sale #${txId}`, 'success');
-            if (state.isMobileView) {
-                document.getElementById('cart-section')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
+        //  reorder functionality with current prices
+        async function reorderTransaction(txId) {
+            try {
+                showLoading('Preparing reorder...', 'Getting your Sale ready');
+                
+                const res = await axios.get(`${API_BASE_URL}/transactions/${txId}`);
+                const tx = res.data;
+                
+                state.cart = []; // Clear current cart
+                
+                let addedCount = 0;
+                for (const item of tx.items) {
+                    const product = state.products.find(p => p.id === item.product_id);
+                    if (product) {
+                        const success = reorderItem(product.id, item.quantity);
+                        if (success) {
+                            addedCount++;
+                        } else {
+                            showNotification(`"${product.name}" is out of stock`, 'warning');
+                        }
+                    }
+                }
+
+                hideLoading();
+
+                const modal = document.getElementById('recent-transactions-modal');
+                if (modal) modal.classList.add('hidden');
+                
+                if (addedCount > 0) {
+                    showNotification(`Added ${addedCount} items to cart from Sale #${txId}`, 'success');
+                    if (state.isMobileView) {
+                        document.getElementById('cart-section')?.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                } else {
+                    showNotification('No items could be added to cart', 'warning');
+                }
+
+            } catch (error) {
+                hideLoading();
+                showNotification('Failed to reorder. Please try again.', 'error');
+                console.error('Reorder error:', error);
+            }
+        }
+
+        function reorderItem(productId, quantity) {
+            const product = state.products.find(p => p.id === productId);
+            if (!product) {
+                console.error(`Product ${productId} not found`);
+                return false;
+            }
+
+            const currentQtyInCart = getCurrentCartQuantity(productId);
+            const availableStock = product.stock - currentQtyInCart;
+
+            if (availableStock < quantity) {
+                showNotification(`Only ${availableStock} available for "${product.name}"`, 'error');
+                return false;
+            }
+
+            let existingItem = state.cart.find(item => item.product_id === productId);
+
+            if (existingItem) {
+                const newQty = existingItem.quantity + quantity;
+
+                if (newQty > product.stock) {
+                    showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
+                    return false;
+                }
+
+                existingItem.quantity = newQty;
+            } else {
+                state.cart.push({
+                    product_id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    discount: product.discount || 0,
+                    image_url: product.image_url,
+                    quantity: quantity,
+                    is_combo: !!product.is_combo,
+                    combination_size: product.combination_size || 0,
+                    combination_price: product.combination_price || 0,
+                    stock: product.stock,
+                    unit: product.unit || '',
+                    minimum_unit: product.minimum_unit || 1
                 });
             }
-        } else {
-            showNotification('No items could be added to cart', 'warning');
+
+            const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
+            if (productCard) {
+                productCard.classList.add('animate-cart-add');
+                setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
+            }
+
+            if (!state.isMobileView && state.cart.length === 1) {
+                state.cartVisible = true;
+            }
+
+            updateCartUI();
+            return true;
         }
 
-    } catch (error) {
-        hideLoading();
-        showNotification('Failed to reorder. Please try again.', 'error');
-        console.error('Reorder error:', error);
-    }
-}
-
-
-// Helper function for status colors
-function getStatusColorClass(status) {
-    const statusMap = {
-        'completed': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
-        'pending': 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200',
-        'cancelled': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200',
-        'refunded': 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200',
-        'processing': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
-    };
-    return statusMap[status.toLowerCase()] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
-}
-
-
-
-
-function reorderItem(productId, quantity) {
-    const product = state.products.find(p => p.id === productId);
-    if (!product) {
-        console.error(`Product ${productId} not found`);
-        return false;
-    }
-
-    const currentQtyInCart = getCurrentCartQuantity(productId);
-    const availableStock = product.stock - currentQtyInCart;
-
-    if (availableStock < quantity) {
-        showNotification(`Only ${availableStock} available for "${product.name}"`, 'error');
-        return false;
-    }
-
-    let existingItem = state.cart.find(item => item.product_id === productId);
-
-    if (existingItem) {
-        const newQty = existingItem.quantity + quantity;
-
-        if (newQty > product.stock) {
-            showNotification(`Only ${product.stock} available for "${product.name}"`, 'error');
-            return false;
+        // Helper function for status colors
+        function getStatusColorClass(status) {
+            const statusMap = {
+                'completed': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
+                'pending': 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200',
+                'cancelled': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200',
+                'refunded': 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200',
+                'processing': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+            };
+            return statusMap[status.toLowerCase()] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
         }
 
-        existingItem.quantity = newQty;
-    } else {
-        state.cart.push({
-            product_id: product.id,
-            name: product.name,
-            price: product.price,
-            discount: product.discount || 0,
-            image_url: product.image_url,
-            quantity: quantity,
-            is_combo: !!product.is_combo,
-            combination_size: product.combination_size || 0,
-            combination_price: product.combination_price || 0,
-            stock: product.stock,
-            unit: product.unit || '',
-            minimum_unit: product.minimum_unit || 1
-        });
-    }
+        function setupProductSearch() {
+            let debounceTimer;
+            const searchInput = elements.productSearch;
 
-    const productCard = document.querySelector(`.pos-card[data-id="${productId}"]`);
-    if (productCard) {
-        productCard.classList.add('animate-cart-add');
-        setTimeout(() => productCard.classList.remove('animate-cart-add'), 500);
-    }
+            if (!searchInput) return;
 
-    if (!state.isMobileView && state.cart.length === 1) {
-        state.cartVisible = true;
-    }
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
 
-    updateCartUI();
-    return true;
-}
+                debounceTimer = setTimeout(async () => {
+                    const query = searchInput.value.trim();
+                    const categoryId = elements.categoryFilter?.value || null;
 
-
-
-
-    // ====================
-    // Product Search
-    // ====================
-    function setupProductSearch() {
-        let debounceTimer;
-        const searchInput = elements.productSearch;
-
-        if (!searchInput) return;
-
-        searchInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-
-            debounceTimer = setTimeout(async () => {
-                const query = searchInput.value.trim();
-                const categoryId = elements.categoryFilter?.value || null;
-
-                if (!query) {
-                    return loadProducts(); // Load full list on empty query
-                }
-
-                try {
-                    // Show skeleton only if we're *about to search*
-                    showSearchSkeleton();
-
-                    const response = await axios.post(`${API_BASE_URL}/products/search`, {
-                        query,
-                        category_id: categoryId
-                    }, {
-                        timeout: 3000
-                    });
-
-                    const products = response.data || [];
-
-                    state.products = products;
-
-                    if (products.length > 0) {
-                        renderProducts(products);
-                    } else {
-                        showNotification('No matching products found.', 'info');
-                        clearProductGrid(); // Optional: show empty state
+                    if (!query) {
+                        return loadProducts(); // Load full list on empty query
                     }
 
-                } catch (err) {
-                    console.warn('Search failed, using fallback:', err);
-                    showNotification('Search failed. Using fallback.', 'warning');
-                    fallbackSearch(query, categoryId);
-                } finally {
-                    hideSearchSkeleton();
-                }
+                    try {
+                        // Show skeleton only if we're *about to search*
+                        showSearchSkeleton();
 
-            }, 250); // debounce
-        });
-    }
+                        const response = await axios.post(`${API_BASE_URL}/products/search`, {
+                            query,
+                            category_id: categoryId
+                        }, {
+                            timeout: 3000
+                        });
 
+                        const products = response.data || [];
 
-    function clearProductGrid() {
-        elements.productGrid.innerHTML = `
-        <div class="text-center text-gray-500 py-8 col-span-full">
-            <i class="fas fa-box-open text-3xl mb-2"></i>
-            <p>No products found.</p>
-        </div>
-    `;
-    }
+                        state.products = products;
 
+                        if (products.length > 0) {
+                            renderProducts(products);
+                        } else {
+                            showNotification('No matching products found.', 'info');
+                            clearProductGrid(); // Optional: show empty state
+                        }
 
+                    } catch (err) {
+                        console.warn('Search failed, using fallback:', err);
+                        showNotification('Search failed. Using fallback.', 'warning');
+                        fallbackSearch(query, categoryId);
+                    } finally {
+                        hideSearchSkeleton();
+                    }
 
-    function showSearchSkeleton(count = 8) {
-        const html = Array(count).fill(`
-        <div class="animate-pulse p-4 bg-white rounded shadow-sm">
-            <div class="h-24 bg-gray-200 rounded mb-2"></div>
-            <div class="h-4 bg-gray-300 w-3/4 mb-1"></div>
-            <div class="h-4 bg-gray-300 w-1/2"></div>
-        </div>
-    `).join('');
-        elements.productGrid.innerHTML = html;
-    }
+                }, 250); // debounce
+            });
+        }
 
-    function hideSearchSkeleton() {
-        // nothing to do; renderProducts will overwrite
-    }
+        function clearProductGrid() {
+            elements.productGrid.innerHTML = `
+            <div class="text-center text-gray-500 py-8 col-span-full">
+                <i class="fas fa-box-open text-3xl mb-2"></i>
+                <p>No products found.</p>
+            </div>
+        `;
+        }
 
-    function fallbackSearch(query, categoryId) {
-        const q = query.toLowerCase();
-        const results = state.products.filter(p => {
-            const matchName = p.name?.toLowerCase().includes(q);
-            const matchBarcode = p.barcode?.includes(query);
-            const matchSKU = p.sku?.includes(query);
-            const matchCategory = !categoryId || p.category_id == categoryId;
+        function showSearchSkeleton(count = 8) {
+            const html = Array(count).fill(`
+            <div class="animate-pulse p-4 bg-white rounded shadow-sm">
+                <div class="h-24 bg-gray-200 rounded mb-2"></div>
+                <div class="h-4 bg-gray-300 w-3/4 mb-1"></div>
+                <div class="h-4 bg-gray-300 w-1/2"></div>
+            </div>
+        `).join('');
+            elements.productGrid.innerHTML = html;
+        }
 
-            return (matchName || matchBarcode || matchSKU) && matchCategory;
-        });
+        function hideSearchSkeleton() {
+            // nothing to do; renderProducts will overwrite
+        }
 
-        renderProducts(results);
-    }
+        function fallbackSearch(query, categoryId) {
+            const q = query.toLowerCase();
+            const results = state.products.filter(p => {
+                const matchName = p.name?.toLowerCase().includes(q);
+                const matchBarcode = p.barcode?.includes(query);
+                const matchSKU = p.sku?.includes(query);
+                const matchCategory = !categoryId || p.category_id == categoryId;
 
+                return (matchName || matchBarcode || matchSKU) && matchCategory;
+            });
+
+            renderProducts(results);
+        }
 
         function setupCartToggles() {
             const headerToggle = document.getElementById('cart-collapse-toggle');
@@ -2004,35 +2269,15 @@ function reorderItem(productId, quantity) {
                 </div>`;
         }
 
-
-            document.querySelectorAll('.payment-method').forEach(btn => {
-              btn.addEventListener('click', (e) => {
-                const isDisabled = btn.dataset.disabled === 'true';
-                if (isDisabled) {
-                  e.preventDefault();
-                  // Replace below with your toast/alert logic
-                  alert('Mobile payment is coming soon!');
-                } else {
-                  // Proceed with selecting payment method
-                  const method = btn.dataset.method;
-                  // Your logic to activate payment...
-                }
-              });
-            });
-
-
-
         // Event Listeners
         function setupEventListeners() {
             elements.clearCartBtn.addEventListener('click', clearCart);
-            elements.completeSaleBtn.addEventListener('click', () => openConfirmSaleModal());
             document.getElementById('cancel-confirm-sale-btn').addEventListener('click', () => hideModal('confirm-sale-modal'));
             document.getElementById('confirm-complete-sale').addEventListener('click', async () => {
                 hideModal('confirm-sale-modal');
                 await completeSale();
             });
             setupCartToggles();
-            setupPaymentMethods();
             setupProductSearch();
             
             window.addEventListener('resize', () => {

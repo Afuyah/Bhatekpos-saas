@@ -154,7 +154,8 @@ class TransactionController(MethodView):
                     Sale.total,
                     Sale.payment_method,
                     Sale.customer_name,
-                    Sale.status
+                    Sale.status,
+                    Sale.is_paid  # Added for payment mode context
                 )
             )\
             .all()
@@ -259,12 +260,17 @@ class TransactionController(MethodView):
                 'applied_discount': decimal_to_float(item.discount) if hasattr(item, 'discount') else 0.0
             })
 
+        # Determine payment mode based on payment method and is_paid status
+        payment_mode = self._determine_payment_mode(sale)
+
         return jsonify({
             'id': sale.id,
             'date': sale.date.isoformat(),
             'total': decimal_to_float(sale.total),
+            'payment_mode': payment_mode,  # Added payment mode
             'payment_method': sale.payment_method,
             'status': sale.status.value,
+            'is_paid': sale.is_paid,  # Added is_paid field
             'customer_name': sale.customer_name or 'Walk-in',
             'customer_phone': sale.customer_phone,
             'items': items,
@@ -279,15 +285,27 @@ class TransactionController(MethodView):
             }
         })
 
+    def _determine_payment_mode(self, sale):
+        """Determine payment mode based on sale data"""
+        if sale.is_paid:
+            return 'pay_now'
+        elif sale.payment_method == 'pay_on_delivery':
+            return 'pay_later'
+        else:
+            # Fallback logic for existing records
+            return 'pay_now' if sale.customer_name is None else 'pay_later'
+
     def _format_recent_transactions(self, transactions):
         """Format recent transactions response"""
         return jsonify([{
             'id': t.id,
             'date': t.date.isoformat(),
             'total': float(t.total),
+            'payment_mode': self._determine_payment_mode(t),  # Added payment mode
             'payment_method': t.payment_method,
             'customer_name': t.customer_name or 'Walk-in',
             'status': t.status.value,
+            'is_paid': t.is_paid,  # Added is_paid field
             'item_count': len(t.cart_items) if hasattr(t, 'cart_items') else 0,
             'contains_combos': any(
                 item.product and item.product.is_combo 
@@ -302,33 +320,51 @@ class TransactionController(MethodView):
         Process checkout - POST /shops/<shop_id>/transactions
         """
         try:
-            checkout_data = CheckoutSchema().load(request.json)
+            # 1️⃣ Validate and parse incoming JSON with payment_mode context
+            checkout_data = request.json
+            schema = CheckoutSchema()
+            schema.context = {'payment_mode': checkout_data.get('payment_mode')}
+            checkout_data = schema.load(checkout_data)
 
+
+            # 2️⃣ Extract key data with new payment_mode field
+            payment_mode = checkout_data['payment_mode']
+            payment_method = checkout_data.get('payment_method')
+            customer_name = checkout_data.get('customer_name')
+            customer_phone = checkout_data.get('customer_phone')
+
+            # 3️⃣ Pass data to SalesService with updated parameters
             result = SalesService.process_checkout(
                 shop_id=shop_id,
                 user_id=current_user.id,
-                cart_items=checkout_data['cart_items'], 
-                payment_method=checkout_data['payment_method'],
+                cart_items=checkout_data['cart_items'],
+                payment_mode=payment_mode,  # Updated parameter
+                payment_method=payment_method,
                 customer_data={
-                    'name': checkout_data.get('customer_name'),
-                    'phone': checkout_data.get('customer_phone')
+                    'name': customer_name,
+                    'phone': customer_phone
                 }
             )
 
+            # 4️⃣ Return response
             return jsonify({
                 'success': True,
                 'sale_id': result['sale_id'],
-                'receipt': result['receipt'],
+                'payment_mode': payment_mode,  
+                'status': result['status'],
                 'amount_paid': result['amount_paid']
-            })
+            }), 201
 
         except ValidationError as e:
             return jsonify({'error': e.messages}), 400
+
         except ValueError as e:
             return jsonify({'error': str(e)}), 400
+
         except Exception as e:
-            logger.error(f"Checkout failed: {str(e)}")
+            logger.error(f"Checkout failed: {str(e)}", exc_info=True)
             return jsonify({'error': 'Checkout processing failed'}), 500
+
 
 
 class ReceiptController(MethodView):

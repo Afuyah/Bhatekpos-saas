@@ -962,7 +962,8 @@ class Sale(BaseModel, ShopScopedMixin):
 
     @validates('payment_method')
     def validate_payment_method(self, key, value):
-        allowed_methods = ['pay_on_delivery', 'mobile']
+        # Update allowed methods to match your schema
+        allowed_methods = ['cash', 'mobile', 'pay_on_delivery']  # ADD 'cash' and 'mobile'
         if value not in allowed_methods:
             raise ValueError(f"Invalid payment method: {value}")
         return value

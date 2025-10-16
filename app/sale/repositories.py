@@ -3,7 +3,7 @@ from sqlalchemy import func, desc, and_, or_
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from .. import db
-from ..models import Product, Category, Sale, CartItem
+from ..models import Product, Category, Sale, CartItem, SaleStatus
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload, with_loader_criteria
 from decimal import Decimal, InvalidOperation
@@ -274,70 +274,131 @@ class SaleRepository:
     @staticmethod
     def get_recent_sales(shop_id: int, limit: int = 5) -> List[Sale]:
         """Get recent sales (no session filtering)"""
-        return db.session.query(Sale)\
-            .filter(Sale.shop_id == shop_id)\
-            .order_by(Sale.date.desc())\
-            .limit(limit).all()
+        return (
+            db.session.query(Sale)
+            .filter(Sale.shop_id == shop_id)
+            .order_by(Sale.date.desc())
+            .limit(limit)
+            .all()
+        )
 
     @staticmethod
     def get_sale_with_items(sale_id: int, shop_id: int) -> Optional[Sale]:
         """Get complete sale data with items"""
-        return db.session.query(Sale)\
-            .filter(
-                and_(
-                    Sale.id == sale_id,
-                    Sale.shop_id == shop_id
-                )
-            )\
-            .options(
-                db.joinedload(Sale.cart_items)
-                .joinedload(CartItem.product)
-            )\
+        return (
+            db.session.query(Sale)
+            .filter(and_(Sale.id == sale_id, Sale.shop_id == shop_id))
+            .options(db.joinedload(Sale.cart_items).joinedload(CartItem.product))
             .first()
+        )
 
     @staticmethod
     def create_sale(
         shop_id: int,
         user_id: int,
         cart_items: List[Dict],
+        payment_mode: str,
         payment_method: str,
-        customer_name: Optional[str] = None
+        customer_name: Optional[str] = None,
+        customer_phone: Optional[str] = None,
+        notes: Optional[str] = None
     ) -> Sale:
         """
-        Create a new sale record using CartItem as sale items
+        Create a new sale record using CartItem as sale items.
+        Handles both 'pay_now' and 'pay_later' scenarios.
         """
-        # Safely calculate subtotal
-        subtotal = float(sum(float(item['price']) * float(item['quantity']) for item in cart_items))
-        tax = float(0)  # or float(subtotal * tax_rate) if needed
+        # Calculate totals - USE total_price INSTEAD of price
+        subtotal = float(sum(float(item["total_price"]) for item in cart_items))
+        tax = float(0)  # Extend later if needed
         total = float(subtotal + tax)
 
-        # Create sale
+        # Determine sale status and payment status based on payment mode
+        if payment_mode == "pay_now":
+            status = SaleStatus.COMPLETED
+            is_paid = True
+        else:  # pay_later
+            status = SaleStatus.PENDING
+            is_paid = False
+
+        # Validate payment method consistency
+        if payment_mode == "pay_now" and payment_method not in ["cash", "mobile"]:
+            raise ValueError(f"Invalid payment method '{payment_method}' for pay_now mode")
+        if payment_mode == "pay_later" and payment_method != "pay_on_delivery":
+            raise ValueError(f"Invalid payment method '{payment_method}' for pay_later mode")
+
+        # Create Sale - aligned with your model structure
         sale = Sale(
             shop_id=shop_id,
             user_id=user_id,
             total=total,
             subtotal=subtotal,
             tax=tax,
+            profit=0.0,  # Calculate profit if needed
             payment_method=payment_method,
-            customer_name=customer_name
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            notes=notes,
+            status=status,
+            is_paid=is_paid,
+            expected_delivery_date=None,
+            register_session_id=None
         )
         db.session.add(sale)
-        db.session.flush()
+        db.session.flush()  # Get sale.id before inserting items
 
-        # Add cart items as sale items
+        # Create Cart Items (serving as sale items)
         for item in cart_items:
-            quantity = float(item['quantity'])
-            unit_price = float(item['price'])
-
             cart_item = CartItem(
                 shop_id=shop_id,
-                product_id=item['product_id'],
-                quantity=quantity,
-                unit_price=unit_price,
-                total_price=unit_price * quantity,
+                product_id=item["product_id"],
+                quantity=Decimal(str(item["quantity"])),
+                unit_price=Decimal(str(item["unit_price"])),  # Use unit_price, not price
+                discount=Decimal(str(item.get("discount", 0.0))),
+                total_price=Decimal(str(item["total_price"])),  # Use total_price
                 sale_id=sale.id
             )
             db.session.add(cart_item)
 
         return sale
+    @staticmethod
+    def update_sale_payment_status(sale_id: int, shop_id: int, is_paid: bool = True) -> Optional[Sale]:
+        """Update payment status for a sale (useful for pay_later -> paid transitions)"""
+        sale = (
+            db.session.query(Sale)
+            .filter(and_(Sale.id == sale_id, Sale.shop_id == shop_id))
+            .first()
+        )
+        
+        if sale:
+            sale.is_paid = is_paid
+            if is_paid:
+                sale.status = SaleStatus.COMPLETED
+            db.session.commit()
+        
+        return sale
+
+    @staticmethod
+    def get_sales_by_payment_mode(shop_id: int, payment_mode: str) -> List[Sale]:
+        """Get sales filtered by payment mode"""
+        if payment_mode == "pay_now":
+            return (
+                db.session.query(Sale)
+                .filter(and_(
+                    Sale.shop_id == shop_id,
+                    Sale.is_paid == True
+                ))
+                .order_by(Sale.date.desc())
+                .all()
+            )
+        else:  # pay_later
+            return (
+                db.session.query(Sale)
+                .filter(and_(
+                    Sale.shop_id == shop_id,
+                    Sale.is_paid == False,
+                    Sale.payment_method == "pay_on_delivery"
+                ))
+                .order_by(Sale.date.desc())
+                .all()
+            )
 

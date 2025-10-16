@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 from flask import request, session
 from .. import db, socketio
 from .repositories import ProductRepository, CategoryRepository, SaleRepository
-from ..models import Shop, Sale, CartItem, Category, Product, Tax
+from ..models import Shop, Sale, CartItem, Category, Product, Tax, SaleStatus
 from sqlalchemy.sql import bindparam
 from app.utils.pricing import PricingUtil
 import threading
@@ -42,7 +42,7 @@ def run_checkout_tasks(sale_id: int, shop_id: int, user_id: int, total: float, i
         logger.error("Post-checkout task failed", extra={'sale_id': sale_id, 'error': str(e), 'trace': traceback.format_exc()})
 
 
-# In services.py
+
 class SalesService:
     @staticmethod
     def get_pos_data(shop_id: int) -> Dict:
@@ -64,42 +64,80 @@ class SalesService:
                     p.serialize(for_pos=True)
                     for p in ProductRepository.get_available_for_sale(shop_id)
                 ],
+                'payment_modes': [  # NEW: Added payment modes
+                    {'value': 'pay_now', 'label': 'Pay Now'},
+                    {'value': 'pay_later', 'label': 'Pay Later'}
+                ],
                 'payment_methods': PaymentService.get_available_methods(shop_id),
                 'tax_rates': TaxService.get_rates(shop_id)
-                
             }
         except Exception as e:
             logger.error(f"Error getting POS data: {str(e)}", exc_info=True)
             raise ValueError("Failed to load POS data") from e
 
     
+    
     @staticmethod
     def process_checkout(
         shop_id: int,
         user_id: int,
         cart_items: List[Dict],
-        payment_method: str,
+        payment_mode: str,
+        payment_method: Optional[str] = None,
         customer_data: Optional[Dict] = None
     ) -> Dict:
+        logger.info(f"Starting checkout process for shop {shop_id}, user {user_id}")
+        logger.info(f"Payment mode: {payment_mode}, method: {payment_method}")
+        logger.info(f"Cart items received: {cart_items}")
+        
         if not cart_items:
+            logger.error("Checkout failed: Empty cart")
             raise ValueError("Cannot process empty sale")
-        if not payment_method:
-            raise ValueError("Payment method is required")
 
-        # Normalize cart data (force Decimal quantity)
-        cart_items = [
-            {
-                'product_id': int(item['product_id']),
-                'quantity': Decimal(str(item['quantity']))
-            }
-            for item in cart_items
-        ]
+        # Validate payment mode and method consistency
+        if payment_mode == 'pay_now':
+            if payment_method not in ['cash', 'mobile']:
+                error_msg = f"Invalid payment method '{payment_method}' for pay_now mode"
+                logger.error(f"Checkout failed: {error_msg}")
+                raise ValueError(error_msg)
+        elif payment_mode == 'pay_later':
+            if payment_method and payment_method != 'pay_on_delivery':
+                error_msg = f"Invalid payment method '{payment_method}' for pay_later mode"
+                logger.error(f"Checkout failed: {error_msg}")
+                raise ValueError(error_msg)
+            payment_method = 'pay_on_delivery'  # Auto-set for pay_later
+            if not customer_data or not customer_data.get('name'):
+                error_msg = "Customer name is required for pay_later sales"
+                logger.error(f"Checkout failed: {error_msg}")
+                raise ValueError(error_msg)
+        else:
+            error_msg = "Invalid payment mode. Use 'pay_now' or 'pay_later'"
+            logger.error(f"Checkout failed: {error_msg}")
+            raise ValueError(error_msg)
+
+        # Normalize cart data
+        try:
+            cart_items = [
+                {
+                    'product_id': int(item["product_id"]),
+                    'quantity': Decimal(str(item["quantity"])),
+                    'price': Decimal(str(item["price"])),  # Make sure price is included
+                }
+                for item in cart_items
+            ]
+            logger.info(f"Normalized cart items: {cart_items}")
+        except KeyError as e:
+            logger.error(f"Checkout failed: Missing field in cart items: {e}")
+            raise ValueError(f"Missing required field in cart items: {e}")
+        except Exception as e:
+            logger.error(f"Checkout failed: Error processing cart items: {e}")
+            raise ValueError(f"Error processing cart items: {e}")
 
         try:
-            # Preload all products in bulk
             product_ids = [item['product_id'] for item in cart_items]
             products = ProductRepository.get_bulk_for_sale(product_ids, shop_id)
             product_map = {p.id: p for p in products}
+            logger.info(f"Found {len(products)} products for checkout")
 
             tax_rate = Decimal(str(Tax.get_tax_rate(shop_id)))
             subtotal = Decimal('0')
@@ -113,29 +151,23 @@ class SalesService:
             for item in cart_items:
                 product = product_map.get(item['product_id'])
                 if not product:
-                    raise ValueError(f"Product {item['product_id']} not found")
+                    error_msg = f"Product {item['product_id']} not found"
+                    logger.error(f"Checkout failed: {error_msg}")
+                    raise ValueError(error_msg)
 
                 quantity = item['quantity']
-                if product.stock < quantity:
-                    raise ValueError(f"Insufficient stock for '{product.name}'")
+                
+                # Check stock availability (only for pay_now sales)
+                if payment_mode == 'pay_now' and product.stock < quantity:
+                    error_msg = f"Insufficient stock for '{product.name}'"
+                    logger.error(f"Checkout failed: {error_msg}")
+                    raise ValueError(error_msg)
 
-                # Calculate combo-aware subtotal
-                if product.is_combo and product.combination_size and product.combination_size > 1:
-                    combo_size = Decimal(str(product.combination_size))
-                    combo_price = Decimal(str(product.combination_price))
-                    unit_price = Decimal(str(product.selling_price))
-
-                    combos = quantity // combo_size
-                    remainder = quantity % combo_size
-                    combo_total = combos * combo_price
-                    remainder_total = min(remainder * unit_price, combo_price)
-                    item_subtotal = combo_total + remainder_total
-                else:
-                    unit_price = Decimal(str(product.selling_price))
-                    item_subtotal = quantity * unit_price
-
-                item_subtotal = round_up_to_nearest_five(item_subtotal)
-
+                # Use provided price from cart item
+                unit_price = item['price']  # This should come from the cart item
+                logger.info(f"Processing item: product_id={item['product_id']}, quantity={quantity}, price={unit_price}")
+                
+                item_subtotal = round_up_to_nearest_five(quantity * unit_price)
                 cost_price = Decimal(str(product.cost_price))
                 item_cost = quantity * cost_price
 
@@ -150,37 +182,43 @@ class SalesService:
                     'total_price': float(item_subtotal)
                 })
 
-                stock_updates.append({
-                    'p_id': product.id,
-                    'new_stock': float(Decimal(str(product.stock)) - quantity)
-                })
+                # Update stock only for pay_now sales
+                if payment_mode == 'pay_now':
+                    stock_updates.append({
+                        'p_id': product.id,
+                        'new_stock': float(Decimal(str(product.stock)) - quantity)
+                    })
 
             tax_amount = (subtotal * tax_rate).quantize(Decimal('0.01'))
             total = subtotal + tax_amount
             profit = subtotal - total_cost
 
-            # Save sale record
-            sale = Sale(
+            logger.info(f"Calculated totals - Subtotal: {subtotal}, Tax: {tax_amount}, Total: {total}")
+
+            # Determine sale status based on payment mode
+            if payment_mode == 'pay_now':
+                sale_status = SaleStatus.COMPLETED
+                is_paid = True
+            else:  # pay_later
+                sale_status = SaleStatus.PENDING
+                is_paid = False
+
+            # Create sale using repository
+            logger.info("Creating sale record...")
+            sale = SaleRepository.create_sale(
                 shop_id=shop_id,
                 user_id=user_id,
-                subtotal=float(subtotal),
-                tax=float(tax_amount),
-                total=float(total),
+                cart_items=cart_item_data,
+                payment_mode=payment_mode,
                 payment_method=payment_method,
-                profit=float(profit)
+                customer_name=customer_data.get('name') if customer_data else None,
+                customer_phone=customer_data.get('phone') if customer_data else None,
+                notes=customer_data.get('notes') if customer_data else None
             )
-            db.session.add(sale)
-            db.session.flush()  # Get sale.id
 
-            # Bulk insert cart items
-            if cart_item_data:
-                db.session.execute(
-                    CartItem.__table__.insert(),
-                    [dict(item, sale_id=sale.id) for item in cart_item_data]
-                )
-
-            # Bulk update product stock
+            # Apply stock updates (only for pay_now)
             if stock_updates:
+                logger.info("Updating stock...")
                 db.session.execute(
                     Product.__table__.update()
                     .where(Product.id == bindparam('p_id'))
@@ -189,35 +227,85 @@ class SalesService:
                 )
 
             db.session.commit()
+            logger.info(f"Sale {sale.id} created successfully")
 
-            # Background receipt and notification tasks
+            # Trigger background tasks only for pay_now sales
+            if payment_mode == 'pay_now':
+                logger.info("Starting background tasks...")
+                threading.Thread(
+                    target=run_checkout_tasks,
+                    args=(sale.id, shop_id, user_id, float(total), len(cart_items)),
+                    daemon=True
+                ).start()
+
+            return {
+                'success': True,
+                'sale_id': sale.id,
+                'payment_mode': payment_mode,
+                'status': sale_status.value,
+                'is_paid': is_paid,
+                'amount_paid': float(total) if is_paid else 0.0,
+                'receipt_pending': is_paid,
+                'customer_name': customer_data.get('name') if customer_data else None
+            }
+
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Checkout failed: {str(e)}", exc_info=True)
+            raise ValueError(f"Checkout processing failed: {str(e)}")
+
+    @staticmethod
+    def complete_pay_later_sale(sale_id: int, shop_id: int, payment_method: str) -> Dict:
+        """
+        Complete a pay_later sale when customer pays
+        """
+        if payment_method not in ['cash', 'mobile']:
+            raise ValueError("Payment method must be 'cash' or 'mobile'")
+
+        sale = SaleRepository.get_sale_with_items(sale_id, shop_id)
+        if not sale:
+            raise ValueError("Sale not found")
+        
+        if sale.is_paid:
+            raise ValueError("Sale is already paid")
+        
+        if sale.payment_method != 'pay_on_delivery':
+            raise ValueError("This sale is not a pay_later sale")
+
+        try:
+            # Update stock for the sale items
+            for cart_item in sale.cart_items:
+                product = cart_item.product
+                if product.stock < cart_item.quantity:
+                    raise ValueError(f"Insufficient stock for '{product.name}'")
+                
+                product.stock -= cart_item.quantity
+
+            # Update sale status
+            sale = SaleRepository.update_sale_payment_status(sale_id, shop_id, True)
+            sale.payment_method = payment_method  # Update to actual payment method used
+
+            db.session.commit()
+
+            # Trigger background tasks
             threading.Thread(
                 target=run_checkout_tasks,
-                args=(sale.id, shop_id, user_id, float(total), len(cart_items)),
+                args=(sale.id, shop_id, sale.user_id, float(sale.total), len(sale.cart_items)),
                 daemon=True
             ).start()
 
             return {
                 'success': True,
                 'sale_id': sale.id,
-                'amount_paid': float(total),
-                'change_due': 0.0,
-                'receipt': None,
-                'receipt_pending': True
+                'status': sale.status.value,
+                'is_paid': sale.is_paid,
+                'amount_paid': float(sale.total)
             }
 
         except Exception as e:
             db.session.rollback()
-            logger.error("Checkout failed", extra={
-                'shop_id': shop_id,
-                'error': str(e),
-                'trace': traceback.format_exc()
-            })
-            raise ValueError(f"Checkout processing failed: {str(e)}")
-
-
-
-            
+            logger.error(f"Failed to complete pay_later sale: {str(e)}")
+            raise ValueError(f"Failed to complete sale: {str(e)}")
 
     @staticmethod
     def get_recent_transactions(shop_id: int, limit: int = 3) -> List[Sale]:
@@ -233,7 +321,8 @@ class SalesService:
                     Sale.total,
                     Sale.payment_method,
                     Sale.customer_name,
-                    Sale.status
+                    Sale.status,
+                    Sale.is_paid  # Added for payment mode context
                 )
             )\
             .all()
@@ -253,16 +342,17 @@ class SalesService:
                     Product.id,
                     Product.name,
                     Product.image_url,
-                    Product.price
+                    Product.selling_price  # Updated to match your model
                 )
             )\
             .first()
 
     @staticmethod
     def get_daily_sales_summary(shop_id: int, days: int = 7) -> dict:
-        """Get sales summary for dashboard"""
+        """Get sales summary for dashboard with payment mode breakdown"""
         date_threshold = datetime.utcnow() - timedelta(days=days)
         
+        # Total sales summary
         result = db.session.query(
             func.count(Sale.id).label('count'),
             func.sum(Sale.total).label('total'),
@@ -275,12 +365,45 @@ class SalesService:
         .group_by(func.date(Sale.date))\
         .order_by(func.date(Sale.date).desc())\
         .all()
-        
-        return [{
-            'date': r.day.strftime('%Y-%m-%d'),
-            'count': r.count,
-            'total': float(r.total) if r.total else 0
-        } for r in result]
+
+        # Payment mode breakdown
+        mode_breakdown = db.session.query(
+            Sale.is_paid,
+            func.count(Sale.id).label('count'),
+            func.sum(Sale.total).label('total')
+        )\
+        .filter(and_(
+            Sale.shop_id == shop_id,
+            Sale.date >= date_threshold
+        ))\
+        .group_by(Sale.is_paid)\
+        .all()
+
+        pay_now_total = 0
+        pay_later_total = 0
+        for breakdown in mode_breakdown:
+            if breakdown.is_paid:
+                pay_now_total = float(breakdown.total) if breakdown.total else 0
+            else:
+                pay_later_total = float(breakdown.total) if breakdown.total else 0
+
+        return {
+            'daily_summary': [{
+                'date': r.day.strftime('%Y-%m-%d'),
+                'count': r.count,
+                'total': float(r.total) if r.total else 0
+            } for r in result],
+            'payment_mode_breakdown': {
+                'pay_now': {
+                    'total': pay_now_total,
+                    'count': sum(b.count for b in mode_breakdown if b.is_paid)
+                },
+                'pay_later': {
+                    'total': pay_later_total,
+                    'count': sum(b.count for b in mode_breakdown if not b.is_paid)
+                }
+            }
+        }
 
     @staticmethod
     def reorder_sale(sale_id: int, shop_id: int) -> dict:
@@ -294,13 +417,14 @@ class SalesService:
                 'product_id': item.product.id,
                 'quantity': float(item.quantity),
                 'original_price': float(item.unit_price),
-                'current_price': float(item.product.price)
+                'current_price': float(item.product.selling_price)  # Updated field
             } for item in sale.cart_items],
             'original_total': float(sale.total),
             'estimated_total': sum(
-                float(item.quantity) * float(item.product.price)
+                float(item.quantity) * float(item.product.selling_price)
                 for item in sale.cart_items
-            )
+            ),
+            'original_payment_mode': 'pay_now' if sale.is_paid else 'pay_later'  # Added payment mode context
         }
 
     
