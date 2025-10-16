@@ -931,7 +931,7 @@ def get_low_stock_products(shop_id):
 @inventory_bp.route('/shops/<int:shop_id>/adjust-stock/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 @shop_access_required
-@role_required(Role.ADMIN, Role.CASHIER)
+@role_required(Role.ADMIN, Role.CASHIER, Role.TENANT)
 def adjust_stock(shop_id, product_id):
     shop = g.current_shop
 
