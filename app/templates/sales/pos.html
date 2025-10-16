@@ -264,53 +264,53 @@
         </div>
     </div>
     
-    <!-- Payment Mode Selection -->
-    <div class="mb-4">
-        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3">Payment Mode</label>
-        <div class="grid grid-cols-2 gap-3" id="payment-modes">
-            <!-- Pay Now -->
-            <button class="payment-mode flex flex-col items-center justify-center py-4 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_now" aria-label="Pay Now">
-                <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-3 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
-                    <i class="fas fa-bolt text-xl"></i>
-                </div>
-                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Now</span>
-                <div class="mt-2 w-6 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
-            </button>
+   <!-- Payment Mode Selection -->
+<div class="mb-4">
+    <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-3">Payment Mode</label>
+    <div class="grid grid-cols-2 gap-3" id="payment-modes">
+        <!-- Pay Now -->
+        <button class="payment-mode flex flex-col items-center justify-center py-3 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_now" aria-label="Pay Now">
+            <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+                <i class="fas fa-bolt text-lg"></i>
+            </div>
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Now</span>
+            <div class="mt-1 w-6 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
+        </button>
 
-            <!-- Pay Later -->
-            <button class="payment-mode flex flex-col items-center justify-center py-4 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_later" aria-label="Pay Later">
-                <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 dark:text-blue-400 mb-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
-                    <i class="fas fa-clock text-xl"></i>
-                </div>
-                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Later</span>
-                <div class="mt-2 w-6 h-1 bg-transparent rounded-full group-hover:bg-blue-500 transition-colors"></div>
-            </button>
-        </div>
+        <!-- Pay Later -->
+        <button class="payment-mode flex flex-col items-center justify-center py-3 border-2 rounded-xl transition-all shadow-sm hover:shadow-md group" data-mode="pay_later" aria-label="Pay Later">
+            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 dark:text-blue-400 mb-2 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
+                <i class="fas fa-clock text-lg"></i>
+            </div>
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pay Later</span>
+            <div class="mt-1 w-6 h-1 bg-transparent rounded-full group-hover:bg-blue-500 transition-colors"></div>
+        </button>
     </div>
+</div>
 
-    <!-- Payment Methods - Conditionally Shown -->
-    <div class="mb-4 hidden" id="payment-methods-container">
-        <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Payment Method</label>
-        <div class="grid grid-cols-2 gap-3" id="payment-methods">
-            <!-- Cash Payment -->
-            <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="cash" aria-label="Cash Payment">
-                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
-                    <i class="fas fa-money-bill-wave text-lg"></i>
-                </div>
-                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Cash</span>
-                <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
-            </button>
+<!-- Payment Methods - Conditionally Shown -->
+<div class="mb-4 hidden" id="payment-methods-container">
+    <label class="block text-gray-700 dark:text-gray-200 text-sm font-semibold mb-2">Payment Method</label>
+    <div class="grid grid-cols-2 gap-3" id="payment-methods">
+        <!-- Cash Payment -->
+        <button class="payment-method flex flex-col items-center justify-center py-2 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="cash" aria-label="Cash Payment">
+            <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 dark:text-green-400 mb-1 group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+                <i class="fas fa-money-bill-wave text-sm"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Cash</span>
+            <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-green-500 transition-colors"></div>
+        </button>
 
-            <!-- Mobile Payment -->
-            <button class="payment-method flex flex-col items-center justify-center py-3 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="mobile" aria-label="Mobile Payment">
-                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 dark:text-purple-400 mb-2 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
-                    <i class="fas fa-mobile-screen-button text-lg"></i>
-                </div>
-                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Mobile</span>
-                <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-purple-500 transition-colors"></div>
-            </button>
-        </div>
+        <!-- Mobile Payment -->
+        <button class="payment-method flex flex-col items-center justify-center py-2 border rounded-lg transition-all shadow-sm hover:shadow-md group" data-method="mobile" aria-label="Mobile Payment">
+            <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 dark:text-purple-400 mb-1 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
+                <i class="fas fa-mobile-screen-button text-sm"></i>
+            </div>
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Mobile</span>
+            <div class="mt-1 w-4 h-1 bg-transparent rounded-full group-hover:bg-purple-500 transition-colors"></div>
+        </button>
     </div>
+</div>
 
     <!-- Customer Name Input - For Pay Later -->
     <div class="mb-4 hidden" id="customer-name-container">
