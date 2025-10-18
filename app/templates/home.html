@@ -219,7 +219,7 @@ Bhatek - Point of Sale System
             </div>
 
             <!-- Error Message Container -->
-            <div id="error-message" class="hidden text-red-600 dark:text-red-400 text-sm text-center"></div>
+            <div id="error-message" class="hidden text-red-600 dark:text-red-400 text-sm text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50"></div>
           </form>
 
           <!-- Security Footer -->
@@ -236,13 +236,13 @@ Bhatek - Point of Sale System
                 <span class="hidden sm:inline">•</span>
                 <span>Version 2.4.1</span>
               </div>
-             <div class="text-gray-500 dark:text-gray-400">
-              Powered by 
-              <a href="https://bhatek.space" target="_blank" rel="noopener noreferrer"
-                 class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                 BhaTek Space
-              </a>
-            </div>
+              <div class="text-gray-500 dark:text-gray-400">
+                Powered by 
+                <a href="https://bhatek.space" target="_blank" rel="noopener noreferrer"
+                   class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                   BhaTek Space
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -305,10 +305,17 @@ Bhatek - Point of Sale System
   .login-button-active {
     transform: scale(0.98);
     background: linear-gradient(to right, #3b82f6, #5b21b6);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Error input highlight */
+  .input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3) !important;
   }
 </style>
 
-<!-- Enhanced JavaScript with Instant AJAX Login -->
+<!-- Enhanced JavaScript with Security Features and Instant AJAX Login -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
@@ -322,8 +329,14 @@ Bhatek - Point of Sale System
 
     // Auto-clear form function
     function clearForm() {
-      if (usernameInput) usernameInput.value = '';
-      if (passwordInput) passwordInput.value = '';
+      if (usernameInput) {
+        usernameInput.value = '';
+        usernameInput.parentElement.classList.remove('input-error');
+      }
+      if (passwordInput) {
+        passwordInput.value = '';
+        passwordInput.parentElement.classList.remove('input-error');
+      }
       
       // Reset password visibility
       if (passwordInput) passwordInput.type = 'password';
@@ -346,8 +359,6 @@ Bhatek - Point of Sale System
       togglePassword.addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
-        
-        // Toggle eye icons
         eyeIcon.classList.toggle('hidden');
         eyeOffIcon.classList.toggle('hidden');
       });
@@ -368,7 +379,7 @@ Bhatek - Point of Sale System
         // Collect form data
         const formData = new FormData(loginForm);
         const data = {
-          username: formData.get('username'),
+          username: formData.get('username').trim(),
           password: formData.get('password'),
           csrf_token: formData.get('csrf_token')
         };
@@ -389,9 +400,16 @@ Bhatek - Point of Sale System
             // Successful login, redirect immediately
             window.location.href = result.redirect || '/dashboard';
           } else {
-            // Show error message
+            // Show error message and focus on problematic field
             errorMessage.textContent = result.message || 'Invalid credentials. Please try again.';
             errorMessage.classList.remove('hidden');
+            if (result.focus_field === 'username' && usernameInput) {
+              usernameInput.parentElement.classList.add('input-error');
+              usernameInput.focus();
+            } else if (result.focus_field === 'password' && passwordInput) {
+              passwordInput.parentElement.classList.add('input-error');
+              passwordInput.focus();
+            }
             clearForm();
           }
         } catch (error) {
@@ -412,6 +430,7 @@ Bhatek - Point of Sale System
     inputs.forEach(input => {
       input.addEventListener('focus', function() {
         this.parentElement.classList.add('ring-2', 'ring-blue-500/20', 'rounded-xl');
+        this.parentElement.classList.remove('input-error');
       });
       
       input.addEventListener('blur', function() {
@@ -438,7 +457,52 @@ Bhatek - Point of Sale System
       });
     }
 
-    console.log('Bhatek POS Security: Instant AJAX login and form auto-clear enabled');
+    // Rate limiting: Track failed login attempts
+    let loginAttempts = 0;
+    const maxAttempts = 5;
+    const lockoutTime = 5 * 60 * 1000; // 5 minutes
+    const attemptKey = 'bhatek_login_attempts';
+    const lockoutKey = 'bhatek_lockout_until';
+
+    // Check for lockout
+    const lockoutUntil = localStorage.getItem(lockoutKey);
+    if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
+      const remaining = Math.ceil((parseInt(lockoutUntil) - Date.now()) / 1000);
+      errorMessage.textContent = `Too many attempts. Try again in ${remaining} seconds.`;
+      errorMessage.classList.remove('hidden');
+      loginButton.disabled = true;
+      setTimeout(() => {
+        localStorage.removeItem(lockoutKey);
+        loginButton.disabled = false;
+        errorMessage.classList.add('hidden');
+      }, remaining * 1000);
+    } else {
+      localStorage.removeItem(lockoutKey);
+      loginAttempts = parseInt(localStorage.getItem(attemptKey)) || 0;
+    }
+
+    loginForm.addEventListener('submit', function() {
+      if (!loginButton.disabled) {
+        loginAttempts++;
+        localStorage.setItem(attemptKey, loginAttempts);
+        if (loginAttempts >= maxAttempts) {
+          const lockoutUntil = Date.now() + lockoutTime;
+          localStorage.setItem(lockoutKey, lockoutUntil);
+          errorMessage.textContent = `Too many attempts. Please wait 5 minutes.`;
+          errorMessage.classList.remove('hidden');
+          loginButton.disabled = true;
+          setTimeout(() => {
+            localStorage.removeItem(lockoutKey);
+            localStorage.removeItem(attemptKey);
+            loginButton.disabled = false;
+            errorMessage.classList.add('hidden');
+            loginAttempts = 0;
+          }, lockoutTime);
+        }
+      }
+    });
+
+    console.log('Bhatek POS Security: Instant AJAX login, form auto-clear, and client-side rate limiting enabled');
   });
 </script>
 {% endblock %}
