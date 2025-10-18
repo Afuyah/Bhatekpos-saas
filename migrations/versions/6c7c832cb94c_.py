@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5015279434b7
+Revision ID: 6c7c832cb94c
 Revises: 
-Create Date: 2025-10-15 17:21:03.109042
+Create Date: 2025-10-17 15:19:40.115780
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 
 # revision identifiers, used by Alembic.
-revision = '5015279434b7'
+revision = '6c7c832cb94c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,7 +51,7 @@ def upgrade():
     sa.Column('approval_notes', sa.Text(), nullable=True),
     sa.Column('logo_url', sa.String(length=255), nullable=True),
     sa.Column('banner_url', sa.String(length=255), nullable=True),
-    
+  
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('registration_number'),
@@ -104,56 +104,6 @@ def upgrade():
     op.create_index('ix_shops_name', 'shops', ['name'], unique=False)
     op.create_index('ix_shops_phone', 'shops', ['phone'], unique=False)
     op.create_index(op.f('ix_shops_slug'), 'shops', ['slug'], unique=True)
-    op.create_table('users',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('username', sa.String(length=100), nullable=False),
-    sa.Column('email', sa.String(length=120), nullable=True),
-    sa.Column('password_hash', sa.String(length=128), nullable=False),
-    sa.Column('last_login', sa.DateTime(), nullable=True),
-    sa.Column('last_password_change', sa.DateTime(), nullable=True),
-    sa.Column('login_attempts', sa.Integer(), nullable=True),
-    sa.Column('locked_until', sa.DateTime(), nullable=True),
-    sa.Column('business_id', sa.Integer(), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.Column('reset_token', sa.String(length=100), nullable=True),
-    sa.Column('reset_token_expires', sa.DateTime(), nullable=True),
-    sa.Column('email_verification_token', sa.String(length=100), nullable=True),
-    sa.Column('email_verified', sa.Boolean(), nullable=True),
-    sa.Column('first_name', sa.String(length=50), nullable=True),
-    sa.Column('last_name', sa.String(length=50), nullable=True),
-    sa.Column('phone', sa.String(length=20), nullable=True),
-    sa.Column('role', sa.Enum('SUPERADMIN', 'TENANT', 'ADMIN', 'CASHIER', name='role'), nullable=False),
-    sa.Column('permissions', sa.JSON(), nullable=True),
-    sa.ForeignKeyConstraint(['business_id'], ['businesses.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index('ix_user_business', 'users', ['business_id'], unique=False)
-    op.create_index('ix_user_role', 'users', ['role'], unique=False)
-    op.create_index('ix_user_shop', 'users', ['shop_id'], unique=False)
-    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
-    op.create_index(op.f('ix_users_is_deleted'), 'users', ['is_deleted'], unique=False)
-    op.create_index(op.f('ix_users_role'), 'users', ['role'], unique=False)
-    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
-    op.create_table('categories',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('position', sa.Integer(), nullable=True),
-    sa.Column('image_url', sa.String(length=255), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('shop_id', 'name', name='uq_category_shop_name')
-    )
-    op.create_index(op.f('ix_categories_is_deleted'), 'categories', ['is_deleted'], unique=False)
-    op.create_index(op.f('ix_categories_name'), 'categories', ['name'], unique=False)
     op.create_table('register_sessions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
@@ -253,18 +203,6 @@ def upgrade():
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_subcounties_is_deleted'), 'subcounties', ['is_deleted'], unique=False)
-    op.create_table('suppliers',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('name', sa.String(length=200), nullable=False),
-    sa.Column('phone', sa.String(length=20), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_suppliers_is_deleted'), 'suppliers', ['is_deleted'], unique=False)
     op.create_table('taxes',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
@@ -281,89 +219,6 @@ def upgrade():
     sa.UniqueConstraint('shop_id', 'name', name='uq_tax_name_per_shop')
     )
     op.create_index(op.f('ix_taxes_is_deleted'), 'taxes', ['is_deleted'], unique=False)
-    op.create_table('products',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('name', sa.String(length=200), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('barcode', sa.String(length=50), nullable=True),
-    sa.Column('sku', sa.String(length=50), nullable=True),
-    sa.Column('cost_price', sa.Numeric(precision=10, scale=2), server_default=sa.text('0.00'), nullable=False),
-    sa.Column('selling_price', sa.Numeric(precision=10, scale=2), server_default=sa.text('0.00'), nullable=False),
-    sa.Column('stock', sa.Integer(), server_default=sa.text('0'), nullable=False),
-    sa.Column('low_stock_threshold', sa.Integer(), server_default=sa.text('10'), nullable=True),
-    sa.Column('image_url', sa.String(length=255), nullable=True),
-    sa.Column('secondary_images', sqlalchemy_utils.types.scalar_list.ScalarListType(), nullable=True),
-    sa.Column('unit', sa.Enum('PIECE', 'KILOGRAM', 'GRAM', 'LITER', 'MILLILITER', 'PACKET', 'BOTTLE', 'BOX', 'METER', 'CENTIMETER', name='unittype'), nullable=True),
-    sa.Column('minimum_unit', sa.Numeric(precision=3, scale=2), server_default=sa.text('1.0'), nullable=False),
-    sa.Column('category_id', sa.Integer(), nullable=False),
-    sa.Column('supplier_id', sa.Integer(), nullable=True),
-    sa.Column('combination_size', sa.Integer(), nullable=True),
-    sa.Column('combination_price', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('combination_unit_price', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=True),
-    sa.Column('is_featured', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('is_discountable', sa.Boolean(), server_default=sa.text('true'), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.ForeignKeyConstraint(['supplier_id'], ['suppliers.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index('ix_product_barcode_shop', 'products', ['barcode', 'shop_id'], unique=False)
-    op.create_index('ix_product_name_shop', 'products', ['name', 'shop_id'], unique=False)
-    op.create_index('ix_product_search', 'products', ['shop_id', 'name', 'barcode', 'sku'], unique=False)
-    op.create_index('ix_product_shop_active', 'products', ['shop_id', 'is_active'], unique=False)
-    op.create_index('ix_product_shop_category', 'products', ['shop_id', 'category_id'], unique=False)
-    op.create_index('ix_product_shop_combo', 'products', ['shop_id', 'combination_size'], unique=False)
-    op.create_index('ix_product_shop_stock', 'products', ['shop_id', 'stock'], unique=False)
-    op.create_index('ix_product_shop_supplier', 'products', ['shop_id', 'supplier_id'], unique=False)
-    op.create_index('ix_product_sku_shop', 'products', ['sku', 'shop_id'], unique=False)
-    op.create_index(op.f('ix_products_barcode'), 'products', ['barcode'], unique=True)
-    op.create_index(op.f('ix_products_category_id'), 'products', ['category_id'], unique=False)
-    op.create_index(op.f('ix_products_is_deleted'), 'products', ['is_deleted'], unique=False)
-    op.create_index(op.f('ix_products_name'), 'products', ['name'], unique=False)
-    op.create_index(op.f('ix_products_sku'), 'products', ['sku'], unique=True)
-    op.create_index(op.f('ix_products_supplier_id'), 'products', ['supplier_id'], unique=False)
-    op.create_table('sales',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('date', sa.DateTime(), nullable=True),
-    sa.Column('total', sa.Float(), nullable=False),
-    sa.Column('profit', sa.Float(), nullable=True),
-    sa.Column('payment_method', sa.String(length=50), nullable=False),
-    sa.Column('customer_phone', sa.String(length=20), nullable=True),
-    sa.Column('customer_name', sa.String(length=200), nullable=True),
-    sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('status', sa.Enum('PENDING', 'CONFIRMED', 'DISPATCHED', 'DELIVERED', 'COMPLETED', 'CANCELLED', name='sale_status'), nullable=False),
-    sa.Column('is_paid', sa.Boolean(), nullable=True),
-    sa.Column('expected_delivery_date', sa.DateTime(), nullable=True),
-    sa.Column('subtotal', sa.Float(), nullable=True),
-    sa.Column('tax', sa.Float(), nullable=True),
-    sa.Column('register_session_id', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['register_session_id'], ['register_sessions.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index('ix_sale_date', 'sales', ['date'], unique=False)
-    op.create_index('ix_sale_payment', 'sales', ['payment_method'], unique=False)
-    op.create_index('ix_sale_session', 'sales', ['register_session_id'], unique=False)
-    op.create_index('ix_sale_shop_date', 'sales', ['shop_id', 'date'], unique=False)
-    op.create_index('ix_sale_shop_pay_date', 'sales', ['shop_id', 'payment_method', 'date'], unique=False)
-    op.create_index('ix_sale_status_paid', 'sales', ['status', 'is_paid'], unique=False)
-    op.create_index('ix_sale_total', 'sales', ['total'], unique=False)
-    op.create_index('ix_sale_user', 'sales', ['user_id'], unique=False)
-    op.create_index(op.f('ix_sales_date'), 'sales', ['date'], unique=False)
-    op.create_index(op.f('ix_sales_is_deleted'), 'sales', ['is_deleted'], unique=False)
-    op.create_index(op.f('ix_sales_is_paid'), 'sales', ['is_paid'], unique=False)
-    op.create_index(op.f('ix_sales_status'), 'sales', ['status'], unique=False)
     op.create_table('wards',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
@@ -375,93 +230,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_wards_is_deleted'), 'wards', ['is_deleted'], unique=False)
-    op.create_table('cart_items',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('quantity', sa.Numeric(precision=12, scale=3), nullable=False),
-    sa.Column('sale_id', sa.Integer(), nullable=False),
-    sa.Column('unit_price', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('discount', sa.Numeric(precision=5, scale=2), nullable=True),
-    sa.Column('total_price', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.CheckConstraint('quantity > 0', name='check_positive_quantity'),
-    sa.CheckConstraint('unit_price >= 0', name='check_non_negative_price'),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['sale_id'], ['sales.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_cart_items_is_deleted'), 'cart_items', ['is_deleted'], unique=False)
-    op.create_index(op.f('ix_cart_items_product_id'), 'cart_items', ['product_id'], unique=False)
-    op.create_index(op.f('ix_cart_items_sale_id'), 'cart_items', ['sale_id'], unique=False)
-    op.create_index('ix_cartitem_product_sale', 'cart_items', ['product_id', 'sale_id'], unique=False)
-    op.create_index('ix_cartitem_sale_product', 'cart_items', ['sale_id', 'product_id'], unique=False)
-    op.create_index('ix_cartitem_shop_product', 'cart_items', ['shop_id', 'product_id'], unique=False)
-    op.create_index('ix_cartitem_shop_sale', 'cart_items', ['shop_id', 'sale_id'], unique=False)
-    op.create_table('expenses',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('description', sa.String(length=200), nullable=False),
-    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=True),
-    sa.Column('category', sa.String(length=100), nullable=True),
-    sa.Column('product_id', sa.Integer(), nullable=True),
-    sa.Column('quantity', sa.Integer(), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index('ix_expense_date_category', 'expenses', ['date', 'category'], unique=False)
-    op.create_index(op.f('ix_expenses_date'), 'expenses', ['date'], unique=False)
-    op.create_index(op.f('ix_expenses_is_deleted'), 'expenses', ['is_deleted'], unique=False)
-    op.create_table('price_changes',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('change_type', sa.String(length=50), nullable=False),
-    sa.Column('old_price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('new_price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('old_combo_size', sa.Integer(), nullable=True),
-    sa.Column('old_combo_price', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('new_combo_size', sa.Integer(), nullable=True),
-    sa.Column('new_combo_price', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('changed_at', sa.DateTime(), nullable=False),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_price_changes_is_deleted'), 'price_changes', ['is_deleted'], unique=False)
-    op.create_table('stock_logs',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True),
-    sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=True),
-    sa.Column('previous_stock', sa.Integer(), nullable=False),
-    sa.Column('new_stock', sa.Integer(), nullable=False),
-    sa.Column('adjustment_type', sa.Enum('addition', 'reduction', 'returned', 'inventory_adjustment', 'damage', name='adjustmenttype'), nullable=False),
-    sa.Column('change_reason', sa.String(length=200), nullable=True),
-    sa.Column('log_metadata', sa.JSON(), nullable=True),
-    sa.Column('shop_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shops.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_stock_logs_is_deleted'), 'stock_logs', ['is_deleted'], unique=False)
     op.create_table('user_addresses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
@@ -491,53 +259,209 @@ def upgrade():
     op.create_index('ix_useraddress_subcounty', 'user_addresses', ['subcounty_id'], unique=False)
     op.create_index('ix_useraddress_user', 'user_addresses', ['user_id'], unique=False)
     op.create_index('ix_useraddress_ward', 'user_addresses', ['ward_id'], unique=False)
+    op.add_column('cart_items', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('cart_items', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('cart_items', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('cart_items', sa.Column('unit_price', sa.Numeric(precision=12, scale=2), nullable=False, server_default='0')
+)
+    op.add_column('cart_items', sa.Column('discount', sa.Numeric(precision=5, scale=2), nullable=True))
+    op.add_column('cart_items', sa.Column('total_price', sa.Numeric(precision=12, scale=2), nullable=False, server_default='0'))
+    op.add_column('cart_items', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.alter_column('cart_items', 'quantity',
+               existing_type=sa.INTEGER(),
+               type_=sa.Numeric(precision=12, scale=3),
+               existing_nullable=False)
+    op.drop_index('ix_product_sale', table_name='cart_items')
+    op.create_index(op.f('ix_cart_items_is_deleted'), 'cart_items', ['is_deleted'], unique=False)
+    op.create_index(op.f('ix_cart_items_product_id'), 'cart_items', ['product_id'], unique=False)
+    op.create_index(op.f('ix_cart_items_sale_id'), 'cart_items', ['sale_id'], unique=False)
+    op.create_index('ix_cartitem_product_sale', 'cart_items', ['product_id', 'sale_id'], unique=False)
+    op.create_index('ix_cartitem_sale_product', 'cart_items', ['sale_id', 'product_id'], unique=False)
+    op.create_index('ix_cartitem_shop_product', 'cart_items', ['shop_id', 'product_id'], unique=False)
+    op.create_index('ix_cartitem_shop_sale', 'cart_items', ['shop_id', 'sale_id'], unique=False)
+    op.create_foreign_key(None, 'cart_items', 'shops', ['shop_id'], ['id'])
+    op.add_column('categories', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('categories', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('categories', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('categories', sa.Column('is_active', sa.Boolean(), nullable=True))
+    op.add_column('categories', sa.Column('position', sa.Integer(), nullable=True))
+    op.add_column('categories', sa.Column('image_url', sa.String(length=255), nullable=True))
+    op.add_column('categories', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.drop_index('ix_categories_name', table_name='categories')
+    op.create_index(op.f('ix_categories_name'), 'categories', ['name'], unique=False)
+    op.create_index(op.f('ix_categories_is_deleted'), 'categories', ['is_deleted'], unique=False)
+    op.create_unique_constraint('uq_category_shop_name', 'categories', ['shop_id', 'name'])
+    op.create_foreign_key(None, 'categories', 'shops', ['shop_id'], ['id'])
+    op.add_column('expenses', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('expenses', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('expenses', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('expenses', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index(op.f('ix_expenses_is_deleted'), 'expenses', ['is_deleted'], unique=False)
+    op.create_foreign_key(None, 'expenses', 'shops', ['shop_id'], ['id'])
+    op.add_column('price_changes', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('price_changes', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('price_changes', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('price_changes', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index(op.f('ix_price_changes_is_deleted'), 'price_changes', ['is_deleted'], unique=False)
+    op.create_foreign_key(None, 'price_changes', 'shops', ['shop_id'], ['id'])
+    op.add_column('products', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('products', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('products', sa.Column('description', sa.Text(), nullable=True))
+    op.add_column('products', sa.Column('barcode', sa.String(length=50), nullable=True))
+    op.add_column('products', sa.Column('sku', sa.String(length=50), nullable=True))
+    op.add_column('products', sa.Column('low_stock_threshold', sa.Integer(), server_default=sa.text('10'), nullable=True))
+    op.add_column('products', sa.Column('image_url', sa.String(length=255), nullable=True))
+    op.add_column('products', sa.Column('secondary_images', sqlalchemy_utils.types.scalar_list.ScalarListType(), nullable=True))
+    op.add_column('products', sa.Column('unit', sa.Enum('PIECE', 'KILOGRAM', 'GRAM', 'LITER', 'MILLILITER', 'PACKET', 'BOTTLE', 'BOX', 'METER', 'CENTIMETER', name='unittype'), nullable=True))
+    op.add_column('products', sa.Column('minimum_unit', sa.Numeric(precision=3, scale=2), server_default=sa.text('1.0'), nullable=False))
+    op.add_column('products', sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=True))
+    op.add_column('products', sa.Column('is_featured', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('products', sa.Column('is_discountable', sa.Boolean(), server_default=sa.text('true'), nullable=True))
+    op.add_column('products', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index('ix_product_barcode_shop', 'products', ['barcode', 'shop_id'], unique=False)
+    op.create_index('ix_product_name_shop', 'products', ['name', 'shop_id'], unique=False)
+    op.create_index('ix_product_search', 'products', ['shop_id', 'name', 'barcode', 'sku'], unique=False)
+    op.create_index('ix_product_shop_active', 'products', ['shop_id', 'is_active'], unique=False)
+    op.create_index('ix_product_shop_category', 'products', ['shop_id', 'category_id'], unique=False)
+    op.create_index('ix_product_shop_combo', 'products', ['shop_id', 'combination_size'], unique=False)
+    op.create_index('ix_product_shop_stock', 'products', ['shop_id', 'stock'], unique=False)
+    op.create_index('ix_product_shop_supplier', 'products', ['shop_id', 'supplier_id'], unique=False)
+    op.create_index('ix_product_sku_shop', 'products', ['sku', 'shop_id'], unique=False)
+    op.create_index(op.f('ix_products_barcode'), 'products', ['barcode'], unique=True)
+    op.create_index(op.f('ix_products_is_deleted'), 'products', ['is_deleted'], unique=False)
+    op.create_index(op.f('ix_products_name'), 'products', ['name'], unique=False)
+    op.create_index(op.f('ix_products_sku'), 'products', ['sku'], unique=True)
+    op.create_foreign_key(None, 'products', 'shops', ['shop_id'], ['id'])
+    op.add_column('sales', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('sales', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('sales', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('sales', sa.Column('customer_phone', sa.String(length=20), nullable=True))
+    op.add_column('sales', sa.Column('notes', sa.Text(), nullable=True))
+    op.add_column('sales', sa.Column('status',sa.Enum('PENDING', 'CONFIRMED', 'DISPATCHED','DELIVERED', 'COMPLETED', 'CANCELLED', name='sale_status' ), nullable=False, server_default='PENDING')
+)
+    op.add_column('sales', sa.Column('is_paid', sa.Boolean(), nullable=True))
+    op.add_column('sales', sa.Column('expected_delivery_date', sa.DateTime(), nullable=True))
+    op.add_column('sales', sa.Column('subtotal', sa.Float(), nullable=True))
+    op.add_column('sales', sa.Column('tax', sa.Float(), nullable=True))
+    op.add_column('sales', sa.Column('register_session_id', sa.Integer(), nullable=True))
+    op.add_column('sales', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index('ix_sale_payment', 'sales', ['payment_method'], unique=False)
+    op.create_index('ix_sale_session', 'sales', ['register_session_id'], unique=False)
+    op.create_index('ix_sale_shop_date', 'sales', ['shop_id', 'date'], unique=False)
+    op.create_index('ix_sale_shop_pay_date', 'sales', ['shop_id', 'payment_method', 'date'], unique=False)
+    op.create_index('ix_sale_status_paid', 'sales', ['status', 'is_paid'], unique=False)
+    op.create_index('ix_sale_user', 'sales', ['user_id'], unique=False)
+    op.create_index(op.f('ix_sales_is_deleted'), 'sales', ['is_deleted'], unique=False)
+    op.create_index(op.f('ix_sales_is_paid'), 'sales', ['is_paid'], unique=False)
+    op.create_index(op.f('ix_sales_status'), 'sales', ['status'], unique=False)
+    op.create_foreign_key(None, 'sales', 'register_sessions', ['register_session_id'], ['id'])
+    op.create_foreign_key(None, 'sales', 'shops', ['shop_id'], ['id'])
+    op.add_column('stock_logs', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('stock_logs', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('stock_logs', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('stock_logs', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index(op.f('ix_stock_logs_is_deleted'), 'stock_logs', ['is_deleted'], unique=False)
+    op.create_foreign_key(None, 'stock_logs', 'shops', ['shop_id'], ['id'])
+    op.add_column('suppliers', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('suppliers', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('suppliers', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('suppliers', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.create_index(op.f('ix_suppliers_is_deleted'), 'suppliers', ['is_deleted'], unique=False)
+    op.create_foreign_key(None, 'suppliers', 'shops', ['shop_id'], ['id'])
+    op.add_column('users', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True))
+    op.add_column('users', sa.Column('updated_at', sa.DateTime(), nullable=True))
+    op.add_column('users', sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=True))
+    op.add_column('users', sa.Column('email', sa.String(length=120), nullable=True))
+    op.add_column('users', sa.Column('last_login', sa.DateTime(), nullable=True))
+    op.add_column('users', sa.Column('last_password_change', sa.DateTime(), nullable=True))
+    op.add_column('users', sa.Column('login_attempts', sa.Integer(), nullable=True))
+    op.add_column('users', sa.Column('locked_until', sa.DateTime(), nullable=True))
+    op.add_column('users', sa.Column('business_id', sa.Integer(), nullable=True))
+    op.add_column('users', sa.Column('shop_id', sa.Integer(), nullable=True))
+    op.add_column('users', sa.Column('reset_token', sa.String(length=100), nullable=True))
+    op.add_column('users', sa.Column('reset_token_expires', sa.DateTime(), nullable=True))
+    op.add_column('users', sa.Column('email_verification_token', sa.String(length=100), nullable=True))
+    op.add_column('users', sa.Column('email_verified', sa.Boolean(), nullable=True))
+    op.add_column('users', sa.Column('first_name', sa.String(length=50), nullable=True))
+    op.add_column('users', sa.Column('last_name', sa.String(length=50), nullable=True))
+    op.add_column('users', sa.Column('phone', sa.String(length=20), nullable=True))
+    op.add_column('users', sa.Column('permissions', sa.JSON(), nullable=True))
+    op.create_index('ix_user_business', 'users', ['business_id'], unique=False)
+    op.create_index('ix_user_shop', 'users', ['shop_id'], unique=False)
+    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.create_index(op.f('ix_users_is_deleted'), 'users', ['is_deleted'], unique=False)
+    op.create_index(op.f('ix_users_role'), 'users', ['role'], unique=False)
+    op.create_foreign_key(None, 'users', 'shops', ['shop_id'], ['id'])
+    op.create_foreign_key(None, 'users', 'businesses', ['business_id'], ['id'])
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index('ix_useraddress_ward', table_name='user_addresses')
-    op.drop_index('ix_useraddress_user', table_name='user_addresses')
-    op.drop_index('ix_useraddress_subcounty', table_name='user_addresses')
-    op.drop_index('ix_useraddress_primary', table_name='user_addresses')
-    op.drop_index(op.f('ix_user_addresses_is_deleted'), table_name='user_addresses')
-    op.drop_table('user_addresses')
+    op.drop_constraint(None, 'users', type_='foreignkey')
+    op.drop_constraint(None, 'users', type_='foreignkey')
+    op.drop_index(op.f('ix_users_role'), table_name='users')
+    op.drop_index(op.f('ix_users_is_deleted'), table_name='users')
+    op.drop_index(op.f('ix_users_email'), table_name='users')
+    op.drop_index('ix_user_shop', table_name='users')
+    op.drop_index('ix_user_business', table_name='users')
+    op.drop_column('users', 'permissions')
+    op.drop_column('users', 'phone')
+    op.drop_column('users', 'last_name')
+    op.drop_column('users', 'first_name')
+    op.drop_column('users', 'email_verified')
+    op.drop_column('users', 'email_verification_token')
+    op.drop_column('users', 'reset_token_expires')
+    op.drop_column('users', 'reset_token')
+    op.drop_column('users', 'shop_id')
+    op.drop_column('users', 'business_id')
+    op.drop_column('users', 'locked_until')
+    op.drop_column('users', 'login_attempts')
+    op.drop_column('users', 'last_password_change')
+    op.drop_column('users', 'last_login')
+    op.drop_column('users', 'email')
+    op.drop_column('users', 'is_deleted')
+    op.drop_column('users', 'updated_at')
+    op.drop_column('users', 'created_at')
+    op.drop_constraint(None, 'suppliers', type_='foreignkey')
+    op.drop_index(op.f('ix_suppliers_is_deleted'), table_name='suppliers')
+    op.drop_column('suppliers', 'shop_id')
+    op.drop_column('suppliers', 'is_deleted')
+    op.drop_column('suppliers', 'updated_at')
+    op.drop_column('suppliers', 'created_at')
+    op.drop_constraint(None, 'stock_logs', type_='foreignkey')
     op.drop_index(op.f('ix_stock_logs_is_deleted'), table_name='stock_logs')
-    op.drop_table('stock_logs')
-    op.drop_index(op.f('ix_price_changes_is_deleted'), table_name='price_changes')
-    op.drop_table('price_changes')
-    op.drop_index(op.f('ix_expenses_is_deleted'), table_name='expenses')
-    op.drop_index(op.f('ix_expenses_date'), table_name='expenses')
-    op.drop_index('ix_expense_date_category', table_name='expenses')
-    op.drop_table('expenses')
-    op.drop_index('ix_cartitem_shop_sale', table_name='cart_items')
-    op.drop_index('ix_cartitem_shop_product', table_name='cart_items')
-    op.drop_index('ix_cartitem_sale_product', table_name='cart_items')
-    op.drop_index('ix_cartitem_product_sale', table_name='cart_items')
-    op.drop_index(op.f('ix_cart_items_sale_id'), table_name='cart_items')
-    op.drop_index(op.f('ix_cart_items_product_id'), table_name='cart_items')
-    op.drop_index(op.f('ix_cart_items_is_deleted'), table_name='cart_items')
-    op.drop_table('cart_items')
-    op.drop_index(op.f('ix_wards_is_deleted'), table_name='wards')
-    op.drop_table('wards')
+    op.drop_column('stock_logs', 'shop_id')
+    op.drop_column('stock_logs', 'is_deleted')
+    op.drop_column('stock_logs', 'updated_at')
+    op.drop_column('stock_logs', 'created_at')
+    op.drop_constraint(None, 'sales', type_='foreignkey')
+    op.drop_constraint(None, 'sales', type_='foreignkey')
     op.drop_index(op.f('ix_sales_status'), table_name='sales')
     op.drop_index(op.f('ix_sales_is_paid'), table_name='sales')
     op.drop_index(op.f('ix_sales_is_deleted'), table_name='sales')
-    op.drop_index(op.f('ix_sales_date'), table_name='sales')
     op.drop_index('ix_sale_user', table_name='sales')
-    op.drop_index('ix_sale_total', table_name='sales')
     op.drop_index('ix_sale_status_paid', table_name='sales')
     op.drop_index('ix_sale_shop_pay_date', table_name='sales')
     op.drop_index('ix_sale_shop_date', table_name='sales')
     op.drop_index('ix_sale_session', table_name='sales')
     op.drop_index('ix_sale_payment', table_name='sales')
-    op.drop_index('ix_sale_date', table_name='sales')
-    op.drop_table('sales')
-    op.drop_index(op.f('ix_products_supplier_id'), table_name='products')
+    op.drop_column('sales', 'shop_id')
+    op.drop_column('sales', 'register_session_id')
+    op.drop_column('sales', 'tax')
+    op.drop_column('sales', 'subtotal')
+    op.drop_column('sales', 'expected_delivery_date')
+    op.drop_column('sales', 'is_paid')
+    op.drop_column('sales', 'status')
+    op.drop_column('sales', 'notes')
+    op.drop_column('sales', 'customer_phone')
+    op.drop_column('sales', 'is_deleted')
+    op.drop_column('sales', 'updated_at')
+    op.drop_column('sales', 'created_at')
+    op.drop_constraint(None, 'products', type_='foreignkey')
     op.drop_index(op.f('ix_products_sku'), table_name='products')
     op.drop_index(op.f('ix_products_name'), table_name='products')
     op.drop_index(op.f('ix_products_is_deleted'), table_name='products')
-    op.drop_index(op.f('ix_products_category_id'), table_name='products')
     op.drop_index(op.f('ix_products_barcode'), table_name='products')
     op.drop_index('ix_product_sku_shop', table_name='products')
     op.drop_index('ix_product_shop_supplier', table_name='products')
@@ -548,11 +472,74 @@ def downgrade():
     op.drop_index('ix_product_search', table_name='products')
     op.drop_index('ix_product_name_shop', table_name='products')
     op.drop_index('ix_product_barcode_shop', table_name='products')
-    op.drop_table('products')
+    op.drop_column('products', 'shop_id')
+    op.drop_column('products', 'is_discountable')
+    op.drop_column('products', 'is_featured')
+    op.drop_column('products', 'is_active')
+    op.drop_column('products', 'minimum_unit')
+    op.drop_column('products', 'unit')
+    op.drop_column('products', 'secondary_images')
+    op.drop_column('products', 'image_url')
+    op.drop_column('products', 'low_stock_threshold')
+    op.drop_column('products', 'sku')
+    op.drop_column('products', 'barcode')
+    op.drop_column('products', 'description')
+    op.drop_column('products', 'is_deleted')
+    op.drop_column('products', 'updated_at')
+    op.drop_constraint(None, 'price_changes', type_='foreignkey')
+    op.drop_index(op.f('ix_price_changes_is_deleted'), table_name='price_changes')
+    op.drop_column('price_changes', 'shop_id')
+    op.drop_column('price_changes', 'is_deleted')
+    op.drop_column('price_changes', 'updated_at')
+    op.drop_column('price_changes', 'created_at')
+    op.drop_constraint(None, 'expenses', type_='foreignkey')
+    op.drop_index(op.f('ix_expenses_is_deleted'), table_name='expenses')
+    op.drop_column('expenses', 'shop_id')
+    op.drop_column('expenses', 'is_deleted')
+    op.drop_column('expenses', 'updated_at')
+    op.drop_column('expenses', 'created_at')
+    op.drop_constraint(None, 'categories', type_='foreignkey')
+    op.drop_constraint('uq_category_shop_name', 'categories', type_='unique')
+    op.drop_index(op.f('ix_categories_is_deleted'), table_name='categories')
+    op.drop_index(op.f('ix_categories_name'), table_name='categories')
+    op.create_index('ix_categories_name', 'categories', ['name'], unique=True)
+    op.drop_column('categories', 'shop_id')
+    op.drop_column('categories', 'image_url')
+    op.drop_column('categories', 'position')
+    op.drop_column('categories', 'is_active')
+    op.drop_column('categories', 'is_deleted')
+    op.drop_column('categories', 'updated_at')
+    op.drop_column('categories', 'created_at')
+    op.drop_constraint(None, 'cart_items', type_='foreignkey')
+    op.drop_index('ix_cartitem_shop_sale', table_name='cart_items')
+    op.drop_index('ix_cartitem_shop_product', table_name='cart_items')
+    op.drop_index('ix_cartitem_sale_product', table_name='cart_items')
+    op.drop_index('ix_cartitem_product_sale', table_name='cart_items')
+    op.drop_index(op.f('ix_cart_items_sale_id'), table_name='cart_items')
+    op.drop_index(op.f('ix_cart_items_product_id'), table_name='cart_items')
+    op.drop_index(op.f('ix_cart_items_is_deleted'), table_name='cart_items')
+    op.create_index('ix_product_sale', 'cart_items', ['product_id', 'sale_id'], unique=False)
+    op.alter_column('cart_items', 'quantity',
+               existing_type=sa.Numeric(precision=12, scale=3),
+               type_=sa.INTEGER(),
+               existing_nullable=False)
+    op.drop_column('cart_items', 'shop_id')
+    op.drop_column('cart_items', 'total_price')
+    op.drop_column('cart_items', 'discount')
+    op.drop_column('cart_items', 'unit_price')
+    op.drop_column('cart_items', 'is_deleted')
+    op.drop_column('cart_items', 'updated_at')
+    op.drop_column('cart_items', 'created_at')
+    op.drop_index('ix_useraddress_ward', table_name='user_addresses')
+    op.drop_index('ix_useraddress_user', table_name='user_addresses')
+    op.drop_index('ix_useraddress_subcounty', table_name='user_addresses')
+    op.drop_index('ix_useraddress_primary', table_name='user_addresses')
+    op.drop_index(op.f('ix_user_addresses_is_deleted'), table_name='user_addresses')
+    op.drop_table('user_addresses')
+    op.drop_index(op.f('ix_wards_is_deleted'), table_name='wards')
+    op.drop_table('wards')
     op.drop_index(op.f('ix_taxes_is_deleted'), table_name='taxes')
     op.drop_table('taxes')
-    op.drop_index(op.f('ix_suppliers_is_deleted'), table_name='suppliers')
-    op.drop_table('suppliers')
     op.drop_index(op.f('ix_subcounties_is_deleted'), table_name='subcounties')
     op.drop_table('subcounties')
     op.drop_index(op.f('ix_shop_homepage_settings_subdomain'), table_name='shop_homepage_settings')
@@ -574,17 +561,6 @@ def downgrade():
     op.drop_index('ix_register_closed_by', table_name='register_sessions')
     op.drop_index('ix_register_closed_at', table_name='register_sessions')
     op.drop_table('register_sessions')
-    op.drop_index(op.f('ix_categories_name'), table_name='categories')
-    op.drop_index(op.f('ix_categories_is_deleted'), table_name='categories')
-    op.drop_table('categories')
-    op.drop_index(op.f('ix_users_username'), table_name='users')
-    op.drop_index(op.f('ix_users_role'), table_name='users')
-    op.drop_index(op.f('ix_users_is_deleted'), table_name='users')
-    op.drop_index(op.f('ix_users_email'), table_name='users')
-    op.drop_index('ix_user_shop', table_name='users')
-    op.drop_index('ix_user_role', table_name='users')
-    op.drop_index('ix_user_business', table_name='users')
-    op.drop_table('users')
     op.drop_index(op.f('ix_shops_slug'), table_name='shops')
     op.drop_index('ix_shops_phone', table_name='shops')
     op.drop_index('ix_shops_name', table_name='shops')

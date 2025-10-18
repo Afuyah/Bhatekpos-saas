@@ -57,8 +57,6 @@ Bhatek - Point of Sale System
         </p>
       </div>
 
-     
-
       <!-- Noticeboard -->
       <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-white/20 dark:border-gray-700/50 transition-all duration-300 hover:shadow-xl">
         <div class="flex items-center justify-between mb-4">
@@ -145,7 +143,7 @@ Bhatek - Point of Sale System
           </div>
           
           <!-- Login Form -->
-          <form class="p-8 space-y-6" action="{{ url_for('auth.login') }}" method="POST" id="login-form">
+          <form class="p-8 space-y-6" id="login-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <!-- Username/Email -->
@@ -206,7 +204,6 @@ Bhatek - Point of Sale System
                   </svg>
                   Encrypted
                 </span>
-               
               </div>
               <div class="text-sm">
                 <a href="#" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">Forgot password?</a>
@@ -217,13 +214,12 @@ Bhatek - Point of Sale System
             <div>
               <button type="submit" id="login-button"
                       class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 group transform hover:scale-[1.02] active:scale-[0.98]">
-                <span id="button-text">Sign In Securely</span>
-                <svg id="button-spinner" class="hidden h-5 w-5 ml-2 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                Sign In Securely
               </button>
             </div>
+
+            <!-- Error Message Container -->
+            <div id="error-message" class="hidden text-red-600 dark:text-red-400 text-sm text-center"></div>
           </form>
 
           <!-- Security Footer -->
@@ -247,7 +243,6 @@ Bhatek - Point of Sale System
                  BhaTek Space
               </a>
             </div>
-
             </div>
           </div>
         </div>
@@ -305,9 +300,15 @@ Bhatek - Point of Sale System
   .animation-delay-4000 {
     animation-delay: 4s;
   }
+
+  /* Subtle button feedback for instant login */
+  .login-button-active {
+    transform: scale(0.98);
+    background: linear-gradient(to right, #3b82f6, #5b21b6);
+  }
 </style>
 
-<!-- Enhanced JavaScript with Security Features -->
+<!-- Enhanced JavaScript with Instant AJAX Login -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
@@ -317,8 +318,7 @@ Bhatek - Point of Sale System
     const eyeOffIcon = document.getElementById('eye-off-icon');
     const loginForm = document.getElementById('login-form');
     const loginButton = document.getElementById('login-button');
-    const buttonText = document.getElementById('button-text');
-    const buttonSpinner = document.getElementById('button-spinner');
+    const errorMessage = document.getElementById('error-message');
 
     // Auto-clear form function
     function clearForm() {
@@ -332,6 +332,10 @@ Bhatek - Point of Sale System
       
       // Reset any custom validation
       loginForm.classList.remove('was-validated');
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
+      }
     }
 
     // Clear form on page load (for when user returns via back button)
@@ -349,34 +353,56 @@ Bhatek - Point of Sale System
       });
     }
 
-    // Enhanced form submission handler
+    // Instant AJAX form submission handler
     if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+
         // Prevent multiple submissions
-        if (loginButton.disabled) {
-          e.preventDefault();
-          return;
-        }
+        if (loginButton.disabled) return;
 
-        if (loginButton && buttonText && buttonSpinner) {
-          // Show loading state
-          loginButton.disabled = true;
-          buttonText.textContent = 'Authenticating...';
-          buttonSpinner.classList.remove('hidden');
-          loginButton.classList.add('cursor-not-allowed', 'opacity-75');
+        // Brief visual feedback on click
+        loginButton.classList.add('login-button-active');
+        loginButton.disabled = true;
 
-          // Store credentials temporarily for the submission
-          const formData = new FormData(loginForm);
-          
-          // Clear form immediately after submission
-          setTimeout(() => {
+        // Collect form data
+        const formData = new FormData(loginForm);
+        const data = {
+          username: formData.get('username'),
+          password: formData.get('password'),
+          csrf_token: formData.get('csrf_token')
+        };
+
+        try {
+          const response = await fetch('{{ url_for("auth.login") }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': data.csrf_token
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            // Successful login, redirect immediately
+            window.location.href = result.redirect || '/dashboard';
+          } else {
+            // Show error message
+            errorMessage.textContent = result.message || 'Invalid credentials. Please try again.';
+            errorMessage.classList.remove('hidden');
             clearForm();
-          }, 100);
-
-          // Optional: Add a small delay to show loading state
-          setTimeout(() => {
-            // Form will submit normally after this
-          }, 500);
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          errorMessage.textContent = 'An error occurred. Please try again.';
+          errorMessage.classList.remove('hidden');
+          clearForm();
+        } finally {
+          // Reset button state
+          loginButton.disabled = false;
+          loginButton.classList.remove('login-button-active');
         }
       });
     }
@@ -396,7 +422,6 @@ Bhatek - Point of Sale System
     // Auto-clear form when page becomes visible (tab switch)
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        // Small delay to ensure user is actively using the page
         setTimeout(clearForm, 1000);
       }
     });
@@ -413,7 +438,7 @@ Bhatek - Point of Sale System
       });
     }
 
-    console.log('Bhatek POS Security: Form auto-clear enabled');
+    console.log('Bhatek POS Security: Instant AJAX login and form auto-clear enabled');
   });
 </script>
 {% endblock %}
